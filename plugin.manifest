@@ -1,0 +1,5 @@
+pluginname=ConverisProjects
+pluginclassname=ConverisProjectsPlugin
+origin=upa
+version=1.0
+studipMinVersion=4.0-alpha-svn

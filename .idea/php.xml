@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhpIncludePathManager">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/docs" />
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/.github" />
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/.git" />
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/tests" />
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/samples" />
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/src" />
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/bin" />
+      <path value="$PROJECT_DIR$/vendor/PhpSpreadsheet/vendor" />
+    </include_path>
+  </component>
+  <component name="PhpProjectSharedConfiguration" php_language_level="7" />
+</project>
