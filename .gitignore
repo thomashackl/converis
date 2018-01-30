@@ -3,3 +3,12 @@
 *.iml
 out
 gen
+
+vendor/PhpSpreadsheet/tests/codeCoverage
+vendor/PhpSpreadsheet/analysis
+vendor/PhpSpreadsheet/vendor/
+vendor/PhpSpreadsheet/phpunit.xml
+vendor/PhpSpreadsheet/.php_cs.cache
+vendor/PhpSpreadsheet/.gitignore
+vendor/PhpSpreadsheet/.gitattributes
+vendor/PhpSpreadsheet/.github
