@@ -23,21 +23,24 @@ class ProjectsController extends AuthenticatedController {
      * Actions and settings taking place before every page call.
      */
     public function before_filter(&$action, &$args) {
-        $GLOBALS['perm']->check('root');
-        $this->plugin = $this->dispatcher->plugin;
-        $this->flash = Trails_Flash::instance();
+        if ($GLOBALS['perm']->have_perm('root') || in_array($GLOBALS['user']->username, ['hackl10', 'kuchle03', 'zukows02'])) {
+            $this->plugin = $this->dispatcher->plugin;
+            $this->flash = Trails_Flash::instance();
 
-        if (Request::isXhr()) {
-            $this->set_layout(null);
+            if (Request::isXhr()) {
+                $this->set_layout(null);
+            } else {
+                $this->set_layout($GLOBALS['template_factory']->open('layouts/base'));
+            }
+
+            // Navigation handling.
+            Navigation::activateItem('/tools/converisprojects');
+
+            $this->sidebar = Sidebar::get();
+            $this->sidebar->setImage('sidebar/doctoral_cap-sidebar.png');
         } else {
-            $this->set_layout($GLOBALS['template_factory']->open('layouts/base'));
+            throw new AccessDeniedException();
         }
-
-        // Navigation handling.
-        Navigation::activateItem('/tools/converisprojects');
-
-        $this->sidebar = Sidebar::get();
-        $this->sidebar->setImage('sidebar/doctoral_cap-sidebar.png');
     }
 
     /**

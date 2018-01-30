@@ -19,7 +19,7 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
     public function __construct() {
         parent::__construct();
         // Plugin only available for roots or role.
-        if ($GLOBALS['perm']->have_perm('root')) {
+        if ($GLOBALS['perm']->have_perm('root') || in_array($GLOBALS['user']->username, ['hackl10', 'kuchle03', 'zukows02'])) {
             $navigation = new Navigation($this->getDisplayName(),
                 PluginEngine::getURL($this, array(), 'projects'));
             $navigation->addSubNavigation('projects',
