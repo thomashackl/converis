@@ -38,8 +38,6 @@ class ProjectsController extends AuthenticatedController {
 
         $this->sidebar = Sidebar::get();
         $this->sidebar->setImage('sidebar/doctoral_cap-sidebar.png');
-
-        StudipAutoloader::addAutoloadPath(__DIR__.'/../models');
     }
 
     /**
