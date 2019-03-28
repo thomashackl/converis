@@ -23,17 +23,19 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
             $navigation = new Navigation($this->getDisplayName(),
                 PluginEngine::getURL($this, array(), 'projects'));
             $navigation->addSubNavigation('projects',
-                new Navigation('Forschungsprojekte',
+                new Navigation(dgettext('converisplugin', 'Forschungsprojekte'),
                     PluginEngine::getURL($this, array(), 'projects')));
             Navigation::addItem('/tools/converisprojects', $navigation);
         }
+
+        StudipAutoloader::addAutoloadPath(__DIR__ . '/models');
     }
 
     /**
      * Plugin name to show in navigation.
      */
     public function getDisplayName() {
-        return 'Forschungsprojekte';
+        return dgettext('converisplugin', 'Forschungsprojekte');
     }
 
     public function perform($unconsumed_path) {
@@ -44,6 +46,18 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
         );
         $dispatcher->plugin = $this;
         $dispatcher->dispatch($unconsumed_path);
+    }
+
+    public static function onEnable($pluginId) {
+        parent::onEnable($pluginId);
+        StudipAutoloader::addAutoloadPath(__DIR__);
+        ConverisProjectsSyncCronjob::register()->schedulePeriodic(4, 0)->activate();
+    }
+
+    public static function onDisable($pluginId) {
+        StudipAutoloader::addAutoloadPath(__DIR__);
+        ConverisProjectsSyncCronjob::unregister();
+        parent::onDisable($pluginId);
     }
 
 }

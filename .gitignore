@@ -1,14 +1,10 @@
-# IntelliJ project files
 .idea
-*.iml
-out
-gen
-
-vendor/PhpSpreadsheet/tests/codeCoverage
-vendor/PhpSpreadsheet/analysis
-vendor/PhpSpreadsheet/vendor/
-vendor/PhpSpreadsheet/phpunit.xml
-vendor/PhpSpreadsheet/.php_cs.cache
-vendor/PhpSpreadsheet/.gitignore
-vendor/PhpSpreadsheet/.gitattributes
-vendor/PhpSpreadsheet/.github
+Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+vendor
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*

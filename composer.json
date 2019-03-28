@@ -1,12 +1,16 @@
 {
-  "name": "vendor_name/package_name",
-  "description": "description_text",
+  "name": "unipassau/studip-converisprojects",
+  "description": "Provides research project data from Converis in Stud.IP",
   "minimum-stability": "stable",
-  "license": "proprietary",
+  "license": "GPL-2 or later",
   "authors": [
     {
-      "name": "author's name",
-      "email": "email@example.com"
+      "name": "Thomas Hackl",
+      "email": "thomas.hackl@uni-passau.de"
     }
-  ]
+  ],
+  "require-dev": {
+    "phpoffice/phpspreadsheet": ">=1.2.1",
+    "tecnickcom/tcpdf": ">=6.0"
+  }
 }
