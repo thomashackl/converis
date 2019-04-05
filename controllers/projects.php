@@ -81,9 +81,12 @@ class ProjectsController extends AuthenticatedController {
 
         PageLayout::setTitle(sprintf(dgettext('converisplugin', 'Liste der Forschungsprojekte für %s'), $this->institute->name));
 
-        $this->free = ConverisProjectFree::findByInstitute_id($this->institute->id);
+        $converisOrganisation = ConverisOrganisation::findOneByName_1($this->institute->name);
 
-        $this->third_party = ConverisProjectThirdParty::findByInstitute_id($this->institute->id);
+        $projectRelations = SimpleCollection::createFromArray(
+            ConverisProjectOrganisationRelation::findByOrganisation_id($converisOrganisation->converis_id)
+        );
+        $this->projects = ConverisProject::findManyByConveris_id($projectRelations->pluck('project_id'));
 
         $actions = new ActionsWidget();
         $actions->addLink(dgettext('converisplugin', 'Excel-Export'),
@@ -96,9 +99,9 @@ class ProjectsController extends AuthenticatedController {
     {
         $institute = Institute::find($institute_id);
 
-        $free = ConverisProjectFree::findByInstitute_id($institute->id);
+        $free = ConverisProject::findByInstitute_id($institute->id);
 
-        $third_party = ConverisProjectThirdParty::findByInstitute_id($institute->id);
+        $third_party = ConverisProjectAggThirdParty::findByInstitute_id($institute->id);
 
         $projects = array_merge($free, $third_party);
         usort($projects, function($a, $b) {

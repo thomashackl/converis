@@ -1,21 +1,13 @@
 <table class="default sortable-table" data-sortlist="[[0,0]]" width="100%">
     <colgroup>
-        <col width="300">
         <col>
-        <?php if ($is_fak == 1) : ?>
-            <col width="300">
-        <?php endif ?>
-        <col width="75">
-        <col width="75">
+        <col width="150">
+        <col width="150">
         <col width="150">
     </colgroup>
     <thead>
         <tr>
-            <th data-sort="text"><?= dgettext('converisplugin', 'Kurzbezeichnung') ?></th>
-            <th data-sort="text"><?= dgettext('converisplugin', 'Langbezeichnung') ?></th>
-            <?php if ($is_fak == 1) : ?>
-                <th data-sort="text"><?= dgettext('converisplugin', 'Einrichtung') ?></th>
-            <?php endif ?>
+            <th data-sort="text"><?= dgettext('converisplugin', 'Name') ?></th>
             <th data-sort="numeric"><?= dgettext('converisplugin', 'Beginn') ?></th>
             <th data-sort="numeric"><?= dgettext('converisplugin', 'Ende') ?></th>
             <th data-sort="text"><?= dgettext('converisplugin', 'Status') ?></th>
@@ -24,35 +16,14 @@
     <tbody>
         <?php foreach ($projects as $project) : ?>
             <tr>
-                <td><?= htmlReady($project->kurzbezeichnung) ?></td>
-                <td><?= htmlReady($project->langbezeichnung) ?></td>
-                <?php if ($is_fak == 1) : ?>
-                    <?php
-                        $institutes = explode('|', preg_replace(
-                            '/(.*) \(.+\)/',
-                                    '$1',
-                                    htmlReady($project->interne_organisationen)
-                        ));
-                    ?>
-                    <td>
-                        <?php if (count($institutes) == 1) : ?>
-                            <?= $institutes[0] ?>
-                        <?php else : ?>
-                            <ul>
-                                <?php foreach ($institutes as $i) : ?>
-                                <li><?= trim($i) ?></li>
-                                <?php endforeach ?>
-                            </ul>
-                        <?php endif ?>
-                    </td>
-                <?php endif ?>
-                <td data-sort-value="<?= strtotime(htmlReady($project->projektbeginn)) ?>">
-                    <?= htmlReady($project->projektbeginn) ?>
+                <td><?= htmlReady($project->name) ?></td>
+                <td data-sort-value="<?= strtotime(htmlReady($project->start_date)) ?>">
+                    <?= htmlReady($project->start_date) ?>
                 </td>
-                <td data-sort-value="<?= strtotime(htmlReady($project->projektende)) ?>">
-                    <?= htmlReady($project->projektende) ?>
+                <td data-sort-value="<?= strtotime(htmlReady($project->end_date)) ?>">
+                    <?= htmlReady($project->end_date) ?>
                 </td>
-                <td><?= htmlReady($project->projektstatus) ?></td>
+                <td><?= htmlReady($project->project_status->name_1) ?></td>
             </tr>
         <?php endforeach ?>
     </tbody>

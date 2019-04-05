@@ -1,6 +1,6 @@
 <?php
 /**
- * ConverisProjectFree.php - model class for free projects
+ * ConverisProjectAggByPersonFree.php - model class for free projects assigned to persons
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -12,12 +12,12 @@
  * @category    ConverisProjects
  */
 
-class ConverisProjectFree extends SimpleORMap
+class ConverisProjectAggThirdParty extends SimpleORMap
 {
 
     protected static function configure($config = array())
     {
-        $config['db_table'] = 'converis_projects_free';
+        $config['db_table'] = 'converis_projects_agg_third_party';
         parent::configure($config);
     }
 

@@ -11,6 +11,6 @@
   ],
   "require-dev": {
     "phpoffice/phpspreadsheet": ">=1.2.1",
-    "tecnickcom/tcpdf": ">=6.0"
+    "mpdf/mpdf": ">=6.0"
   }
 }
