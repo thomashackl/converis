@@ -70,6 +70,24 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 false
             );
 
+            // Get applications.
+            $this->importConverisData(
+                "SELECT DISTINCT
+                    id AS converis_id,
+                    start_date,
+                    end_date,
+                    deadline,
+                    funding_amount,
+                    funding_amount_cur,
+                    commentary_financial_data,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM iot_application
+                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                ORDER BY id",
+                'ConverisApplication'
+            );
+
             // Get project data.
             $this->importConverisData(
                 "SELECT DISTINCT
@@ -94,10 +112,12 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     p.end_date,
                     s.status_process AS status,
                     p.ispublic AS is_public,
+                    a.iot_application AS application_id,
                     p.c_created_on AS mkdate,
                     p.c_updated_on AS chdate
                 FROM iot_project_general p
                     JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
+                    LEFT JOIN rel_application_has_project a ON (a.iot_project = p.id)
                 WHERE p.name IS NOT NULL
                     AND (p.c_created_on > :tstamp OR p.c_updated_on > :tstamp)
                 UNION
@@ -123,10 +143,12 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     p.end_date,
                     s.status_process AS status,
                     p.ispublic AS is_public,
+                    a.iot_application AS application_id,
                     p.c_created_on AS mkdate,
                     p.c_updated_on AS chdate
                 FROM iot_project p
                     JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
+                    LEFT JOIN rel_application_has_project a ON (a.iot_project = p.id)
                 WHERE p.name IS NOT NULL
                     AND (p.c_created_on > :tstamp OR p.c_updated_on > :tstamp)
                 ORDER BY converis_id",
@@ -174,16 +196,16 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     p.c_created_on AS mkdate,
                     p.c_updated_on AS chdate
                 FROM iot_project p
-                    JOIN choicegroupvalue c1 ON (c1.id = p.total_project_expenses_cu)
-                    JOIN choicegroupvalue c2 ON (c2.id = p.expenses_university_cur)
-                    JOIN choicegroupvalue c3 ON (c3.id = p.funding_central_cur)
-                    JOIN choicegroupvalue c4 ON (c4.id = p.funding_chair_cur)
-                    JOIN choicegroupvalue c5 ON (c5.id = p.funding_third_party_cur)
-                    JOIN choicegroupvalue c6 ON (c6.id = p.contract_sum_netto_cur)
-                    JOIN choicegroupvalue c7 ON (c7.id = p.contract_sum_brutto_cur)
-                    JOIN choicegroupvalue c8 ON (c8.id = p.contract_tax_cur)
-                    JOIN choicegroupvalue c9 ON (c9.id = p.own_contribution_cur)
-                    JOIN choicegroupvalue c10 ON (c10.id = p.funding_amount_cur)
+                    LEFT JOIN choicegroupvalue c1 ON (c1.id = p.total_project_expenses_cu)
+                    LEFT JOIN choicegroupvalue c2 ON (c2.id = p.expenses_university_cur)
+                    LEFT JOIN choicegroupvalue c3 ON (c3.id = p.funding_central_cur)
+                    LEFT JOIN choicegroupvalue c4 ON (c4.id = p.funding_chair_cur)
+                    LEFT JOIN choicegroupvalue c5 ON (c5.id = p.funding_third_party_cur)
+                    LEFT JOIN choicegroupvalue c6 ON (c6.id = p.contract_sum_netto_cur)
+                    LEFT JOIN choicegroupvalue c7 ON (c7.id = p.contract_sum_brutto_cur)
+                    LEFT JOIN choicegroupvalue c8 ON (c8.id = p.contract_tax_cur)
+                    LEFT JOIN choicegroupvalue c9 ON (c9.id = p.own_contribution_cur)
+                    LEFT JOIN choicegroupvalue c10 ON (c10.id = p.funding_amount_cur)
                 WHERE p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
                 ORDER BY converis_id",
                 'ConverisProjectThirdPartyData'
@@ -213,7 +235,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     o.c_created_on AS mkdate,
                     o.c_updated_on AS chdate
                 FROM iot_organisation o
-                    JOIN choicegroupvalue c ON (c.id = o.external_or_internal)
+                    LEFT JOIN choicegroupvalue c ON (c.id = o.external_or_internal)
                 WHERE o.c_created_on > :tstamp OR o.c_updated_on > :tstamp
                 ORDER BY converis_id",
                 'ConverisOrganisation'
@@ -234,7 +256,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     p.c_created_on AS mkdate,
                     p.c_updated_on AS chdate
                 FROM iot_person p
-                    JOIN choicegroupvalue c ON (c.id = p.external)
+                    LEFT JOIN choicegroupvalue c ON (c.id = p.external)
                 WHERE p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
                 ORDER BY converis_id",
                 'ConverisPerson'
@@ -250,7 +272,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     a.c_created_on AS mkdate,
                     a.c_updated_on AS chdate
                 FROM iot_area a
-                    JOIN choicegroupvalue c ON (c.id = a.area_type)
+                    LEFT JOIN choicegroupvalue c ON (c.id = a.area_type)
                 WHERE a.c_created_on > :tstamp OR a.c_updated_on > :tstamp
                 ORDER BY converis_id",
                 'ConverisArea'
@@ -279,7 +301,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
-                    JOIN iot_project p ON (p.project_type = c.id)
+                    LEFT JOIN iot_project p ON (p.project_type = c.id)
                 ORDER BY c.id",
                 'ConverisProjectType',
                 'converis_id',
@@ -300,7 +322,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
-                JOIN rel_orga_has_proj_ext oe ON (oe.role = c.id)
+                    LEFT JOIN rel_orga_has_proj_ext oe ON (oe.role = c.id)
                 ORDER BY converis_id",
                 'ConverisRole',
                 'converis_id',
@@ -494,6 +516,10 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 $sql = "`" . $checkKey . "` = ?";
                 $params = [$one[$checkKey]];
             }
+
+            array_walk($one, function(&$value, $key) {
+                $value = html_entity_decode(strip_tags($value));
+            });
 
             $object = $studipModelName::build($one, $studipModelName::countBySQL($sql, $params) == 0);
             $object->store();

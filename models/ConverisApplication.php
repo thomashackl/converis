@@ -1,7 +1,6 @@
 <?php
 /**
- * ConverisProjectSourceOfFundsRelation.php
- * model class for relation between projects and organisations from Converis
+ * ConverisApplication.php - model class for research project applications from Converis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -11,24 +10,26 @@
  * @author      Thomas Hackl <thomas.hackl@uni-passau.de>
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
+ *
+ * @property int application_id database column
+ * @property int converis_id database column
+ * @property string start_date database column
+ * @property string end_date database column
+ * @property string deadline database column
+ * @property string funding_amount database column
+ * @property string funding_amount_cur database column
+ * @property string commentary_financial_data database column
+ * @property string mkdate database column
+ * @property string chdate database colum
+ * @property string id computed column read/write
  */
 
-class ConverisProjectSourceOfFundsRelation extends SimpleORMap
+class ConverisApplication extends SimpleORMap
 {
 
     protected static function configure($config = array())
     {
-        $config['db_table'] = 'converis_project_source_of_funds';
-        $config['belongs_to']['source_of_funds'] = [
-            'class_name' => 'ConverisSourceOfFunds',
-            'foreign_key' => 'source_id',
-            'assoc_foreign_key' => 'converis_id'
-        ];
-        $config['belongs_to']['project'] = [
-            'class_name' => 'ConverisProject',
-            'foreign_key' => 'project_id',
-            'assoc_foreign_key' => 'converis_id'
-        ];
+        $config['db_table'] = 'converis_applications';
         parent::configure($config);
     }
 

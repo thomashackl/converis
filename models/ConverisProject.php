@@ -33,11 +33,13 @@
  * @property string end_date database column
  * @property int status database column
  * @property int is_public database column
+ * @property int application_id database column
  * @property string mkdate database column
  * @property string chdate database colum
  * @property string id computed column read/write
  * @property ConverisProjectStatus project_status has_one ConverisProjectStatus
  * @property ConverisProjectThirdPartyData third_party_data has_one ConverisProjectThirdPartyData
+ * @property ConverisApplication application has_one ConverisApplication
  * @property SimpleORMapCollection related_organisations has_many ConverisProjectOrganisationRelation
  * @property SimpleORMapCollection related_persons has_many ConverisProjectPersonRelation
  * @property SimpleORMapCollection areas has_many ConverisProjectArea
@@ -57,7 +59,13 @@ class ConverisProject extends SimpleORMap
         ];
         $config['has_one']['third_party_data'] = [
             'class_name' => 'ConverisProjectThirdPartyData',
-            'foreign_key' => 'converis_id'
+            'foreign_key' => 'converis_id',
+            'assoc_foreign_key' => 'converis_id'
+        ];
+        $config['has_one']['application'] = [
+            'class_name' => 'ConverisApplication',
+            'foreign_key' => 'application_id',
+            'assoc_foreign_key' => 'converis_id'
         ];
         $config['has_many']['related_organisations'] = [
             'class_name' => 'ConverisProjectOrganisationRelation',
@@ -77,10 +85,9 @@ class ConverisProject extends SimpleORMap
             'order_by' => 'ORDER BY `name`',
         ];
         $config['has_many']['related_sources_of_funds'] = [
-            'class_name' => 'ConverisSourceOfFundsRelation',
+            'class_name' => 'ConverisProjectSourceOfFundsRelation',
             'foreign_key' => 'converis_id',
-            'assoc_foreign_key' => 'project_id',
-            'order_by' => 'ORDER BY `name`',
+            'assoc_foreign_key' => 'project_id'
         ];
         parent::configure($config);
     }

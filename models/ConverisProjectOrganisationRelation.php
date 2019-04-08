@@ -19,17 +19,17 @@ class ConverisProjectOrganisationRelation extends SimpleORMap
     protected static function configure($config = array())
     {
         $config['db_table'] = 'converis_project_organisation';
-        $config['has_one']['role'] = [
+        $config['has_one']['role_object'] = [
             'class_name' => 'ConverisRole',
             'foreign_key' => 'role',
             'assoc_foreign_key' => 'converis_id'
         ];
-        $config['belongs_to']['projects'] = [
+        $config['belongs_to']['project'] = [
             'class_name' => 'ConverisProject',
             'foreign_key' => 'project_id',
             'assoc_foreign_key' => 'converis_id'
         ];
-        $config['belongs_to']['organisations'] = [
+        $config['belongs_to']['organisation'] = [
             'class_name' => 'ConverisOrganisation',
             'foreign_key' => 'organisation_id',
             'assoc_foreign_key' => 'converis_id'

@@ -4,6 +4,23 @@ class Init extends Migration {
 
     public function up()
     {
+        // Applications
+        DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_applications`
+        (
+            `application_id` INT NOT NULL AUTO_INCREMENT,
+            `converis_id` INT NOT NULL,
+            `start_date` DATE NULL,
+            `end_date` DATE NULL,
+            `deadline` DATE NULL,
+            `funding_amount` FLOAT(11,2) NULL,
+            `funding_amount_cur` VARCHAR(100) NULL,
+            `commentary_financial_data` TEXT NULL,
+            `mkdate` DATETIME(3) NOT NULL,
+            `chdate` DATETIME(3) NOT NULL,
+            PRIMARY KEY (`application_id`),
+            UNIQUE KEY (`converis_id`)
+        ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
+
         // Research projects.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_projects`
         (
@@ -29,6 +46,7 @@ class Init extends Migration {
             `end_date` DATE NULL,
             `status` INT NOT NULL DEFAULT 0,
             `is_public` INT NULL,
+            `application_id` INT NULL REFERENCES `converis_appliactions`.`converis_id`,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
             PRIMARY KEY (`project_id`),
@@ -46,28 +64,28 @@ class Init extends Migration {
             `extension_until` DATETIME NULL,
             `stepped_into_running_project` DATETIME NULL,
             `date_exit_project` DATETIME NULL,
-            `total_project_expenses` FLOAT(10,2) NULL,
+            `total_project_expenses` FLOAT(11,2) NULL,
             `total_project_expenses_cur` VARCHAR(100) NULL,
-            `expenses_university` FLOAT(10,2) NULL,
+            `expenses_university` FLOAT(11,2) NULL,
             `expenses_university_cur` VARCHAR(100) NULL,
             `funding_quota` VARCHAR(10) NULL,
             `project_flat_charge` VARCHAR(255) NULL,
-            `funding_central_resources` FLOAT(10,2) NULL,
+            `funding_central_resources` FLOAT(11,2) NULL,
             `funding_central_resources_cur` VARCHAR(100) NULL,
-            `funding_chair` FLOAT(10,2) NULL,
+            `funding_chair` FLOAT(11,2) NULL,
             `funding_chair_cur` VARCHAR(100) NULL,
-            `funding_third_party` FLOAT(10,2) NULL,
+            `funding_third_party` FLOAT(11,2) NULL,
             `funding_third_party_cur` VARCHAR(100) NULL,
-            `contract_sum_netto` FLOAT(10,2) NULL,
+            `contract_sum_netto` FLOAT(11,2) NULL,
             `contract_sum_netto_cur` VARCHAR(100) NULL,
-            `contract_sum_brutto` FLOAT(10,2) NULL,
+            `contract_sum_brutto` FLOAT(11,2) NULL,
             `contract_sum_brutto_cur` VARCHAR(100) NULL,
             `contract_tax_rate` FLOAT(5,2) NULL,
-            `contract_tax` FLOAT(10,2) NULL,
+            `contract_tax` FLOAT(11,2) NULL,
             `contract_tax_cur` VARCHAR(100) NULL,
-            `own_contribution` FLOAT(10,2) NULL,
+            `own_contribution` FLOAT(11,2) NULL,
             `own_contribution_cur` VARCHAR(100) NULL,
-            `funding_amount` FLOAT(10,2) NULL,
+            `funding_amount` FLOAT(11,2) NULL,
             `funding_amount_cur` VARCHAR(100) NULL,
             `date_of_grant_agreement` DATETIME NULL,
             `commentary_funding` TEXT NULL,
@@ -218,7 +236,7 @@ class Init extends Migration {
         (
             `project_id` INT NOT NULL REFERENCES `converis_projects`.`converis_id`,
             `source_id` INT NOT NULL REFERENCES `converis_sources_of_funds`.`converis_id`,
-            `amount` FLOAT(10,2) NULL,
+            `amount` FLOAT(11,2) NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
             PRIMARY KEY (`project_id`, `source_id`)

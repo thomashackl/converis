@@ -16,7 +16,7 @@
     <tbody>
         <?php foreach ($projects as $project) : ?>
             <tr>
-                <td><?= htmlReady($project->name) ?></td>
+                <td><?= htmlReady($project->name) ?> (<?= $project->converis_id ?>)</td>
                 <td data-sort-value="<?= strtotime(htmlReady($project->start_date)) ?>">
                     <?= htmlReady($project->start_date) ?>
                 </td>
