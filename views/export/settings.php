@@ -27,7 +27,7 @@
             <select name="template" id="template">
                 <?php foreach ($templates as $index => $data) : ?>
                 <option value="<?= htmlReady($index) ?>">
-                    <?= htmlReady($data['name']) ?> (<?= htmlReady($data['format']) ?>)
+                    <?= htmlReady($data['name']) ?>
                 </option>
                 <?php endforeach ?>
             </select>

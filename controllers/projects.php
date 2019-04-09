@@ -93,9 +93,9 @@ class ProjectsController extends AuthenticatedController {
 
         if (count($this->projects) > 0) {
             $actions = new ActionsWidget();
-            $actions->addLink(dgettext('converisplugin', 'PDF-Export'),
+            $actions->addLink(dgettext('converisplugin', 'Forschungsbericht erstellen'),
                 $this->url_for('export/settings', $this->institute->id, $converisOrganisation->converis_id),
-                Icon::create('file-pdf'))->asDialog('size=auto');
+                Icon::create('literature2'))->asDialog('size=auto');
             $this->sidebar->addWidget($actions);
         }
     }
