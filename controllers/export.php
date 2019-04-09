@@ -81,9 +81,6 @@ class ExportController extends AuthenticatedController
      */
     public function pdf_fim_action($start, $end, $studipInstituteId, $converisOrganisationId)
     {
-
-        PageLayout::postInfo('Stud.IP institute: ' . $studipInstituteId . ', Converis organisation: ' . $converisOrganisationId);
-
         $this->start = $start;
         $this->end = $end;
 

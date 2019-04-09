@@ -64,15 +64,9 @@ class ProjectsController extends AuthenticatedController {
     /**
      * Loads research projects for a given institute from Converis.
      */
-    public function list_action()
+    public function list_action($institute_id = '')
     {
-        $navigation = Navigation::getItem('/tools/converisprojects');
-        $navigation->addSubNavigation('list',
-            new Navigation(dgettext('converisplugin', 'Forschungsprojekte'),
-                PluginEngine::getURL($this, array('institute' => Request::option('institute')), 'projects/list')));
-        Navigation::activateItem('/tools/converisprojects/list');
-
-        $this->institute = Institute::find(Request::option('institute'));
+        $this->institute = Institute::find($institute_id != '' ? $institute_id : Request::option('institute'));
 
         $this->flash['institute'] = $this->institute->id;
 
@@ -86,6 +80,17 @@ class ProjectsController extends AuthenticatedController {
             ConverisProjectOrganisationRelation::findByOrganisation_id($converisOrganisation->converis_id)
         );
         $this->projects = ConverisProject::findManyByConveris_id($projectRelations->pluck('project_id'));
+
+        $views = new ViewsWidget();
+        $views->addLink(
+            dgettext('converisplugin', 'Einrichtung wählen'),
+            $this->url_for('projects')
+        );
+        $views->addLink(
+            dgettext('converisplugin', 'Projektliste'),
+            $this->url_for('projects/list', Request::option('institute'))
+        )->setActive(true);
+        $this->sidebar->addWidget($views);
 
         if (count($this->projects) > 0) {
             $actions = new ActionsWidget();
