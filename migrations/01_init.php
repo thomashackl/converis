@@ -273,6 +273,15 @@ class Init extends Migration {
                 'section' => 'converisplugin',
                 'description' => 'Name der Converis-Datenbank'
             ));
+            Config::get()->create('CONVERIS_REPORT_TEMPLATES', array(
+                'value' => json_encode([
+                    'pdf_fim' => ['name' => 'Forschungsbericht FIM', 'action' => 'pdf_fim', 'format' => 'pdf']
+                ]),
+                'type' => 'array',
+                'range' => 'global',
+                'section' => 'converisplugin',
+                'description' => 'Verfügbare Vorlage für Forschungsberichte'
+            ));
         } catch (InvalidArgumentException $e) {}
     }
 

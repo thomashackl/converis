@@ -18,10 +18,10 @@
             <tr>
                 <td><?= htmlReady($project->name) ?> (<?= $project->converis_id ?>)</td>
                 <td data-sort-value="<?= strtotime(htmlReady($project->start_date)) ?>">
-                    <?= htmlReady($project->start_date) ?>
+                    <?= htmlReady(strtotime($project->start_date) > 0 ? $project->start_date : '-') ?>
                 </td>
                 <td data-sort-value="<?= strtotime(htmlReady($project->end_date)) ?>">
-                    <?= htmlReady($project->end_date) ?>
+                    <?= htmlReady(strtotime($project->end_date) > 0 ? $project->end_date : '-') ?>
                 </td>
                 <td><?= htmlReady($project->project_status->name_1) ?></td>
             </tr>

@@ -68,7 +68,7 @@ class ProjectsController extends AuthenticatedController {
     {
         $navigation = Navigation::getItem('/tools/converisprojects');
         $navigation->addSubNavigation('list',
-            new Navigation(dgettext('converisplugin', 'Projektliste'),
+            new Navigation(dgettext('converisplugin', 'Forschungsprojekte'),
                 PluginEngine::getURL($this, array('institute' => Request::option('institute')), 'projects/list')));
         Navigation::activateItem('/tools/converisprojects/list');
 
@@ -82,9 +82,6 @@ class ProjectsController extends AuthenticatedController {
 
         $converisOrganisation = ConverisOrganisation::findOneByName_1($this->institute->name);
 
-        $this->flash['converis_organisation'] = $converisOrganisation->converis_id;
-        $this->flash['studip_institute'] = Request::option('institute');
-
         $projectRelations = SimpleCollection::createFromArray(
             ConverisProjectOrganisationRelation::findByOrganisation_id($converisOrganisation->converis_id)
         );
@@ -93,7 +90,7 @@ class ProjectsController extends AuthenticatedController {
         if (count($this->projects) > 0) {
             $actions = new ActionsWidget();
             $actions->addLink(dgettext('converisplugin', 'PDF-Export'),
-                $this->url_for('export/settings'),
+                $this->url_for('export/settings', $this->institute->id, $converisOrganisation->converis_id),
                 Icon::create('file-pdf'))->asDialog('size=auto');
             $this->sidebar->addWidget($actions);
         }

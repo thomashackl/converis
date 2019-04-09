@@ -5,7 +5,7 @@
             body {
                 border: 1px solid #000000;
                 font-family: Arial, sans-serif;
-                font-size: 10pt;
+                font-size: 9pt;
             }
             h1 {
                 background-color: #dadada;
@@ -142,17 +142,29 @@
                         <?= htmlReady($p->third_party_data->funding_chair) ?>
                         <?= htmlReady($p->third_party_data->funding_chair_cur) ?>
                     </td>
-                    <td<?php $orga = $p->related_organisations ?>>
-                        <ul>
-                            <?php foreach ($orga as $one) :?>
-                            <li>
-                                <?= htmlReady($one->organisation->name_1) ?>
-                                <?php if ($one->role != '') : ?>
-                                    (<?= htmlReady($one->role_object->name_1) ?>)
-                                <?php endif ?>
-                            </li>
-                            <?php endforeach ?>
-                        </ul>
+                    <td>
+                        <?php
+                            $orga = $p->related_organisations->filter(function($one) {
+                                return $one->type == 'internal';
+                            });
+                        ?>
+                        <?php if (count($orga) == 1) : $one = $orga->first(); ?>
+                            <?= htmlReady($one->organisation->name_1) ?>
+                            <?php if ($one->role != '') : ?>
+                                (<?= htmlReady($one->role_object->name_1) ?>)
+                            <?php endif ?>
+                        <?php else : ?>
+                            <ul>
+                                <?php foreach ($orga as $one) :?>
+                                <li>
+                                    <?= htmlReady($one->organisation->name_1) ?>
+                                    <?php if ($one->role != '') : ?>
+                                        (<?= htmlReady($one->role_object->name_1) ?>)
+                                    <?php endif ?>
+                                </li>
+                                <?php endforeach ?>
+                            </ul>
+                        <?php endif ?>
                     </td>
                     <td>
                         <?= htmlReady($p->project_status->name_1) ?>

@@ -36,44 +36,64 @@ class ExportController extends AuthenticatedController
         }
     }
 
-    public function settings_action()
+    public function settings_action($studipInstituteId, $converisOrganisationId)
     {
         if (!Request::isXhr()) {
             $this->set_layout($GLOBALS['template_factory']->open('layouts/base'));
         }
 
-        PageLayout::setTitle(dgettext('converisplugin', 'Berichtszeitraum festlegen'));
+        PageLayout::setTitle(dgettext('converisplugin', 'Forschungsbericht erstellen'));
 
-        $this->organisationId = $this->flash['converis_organisation'];
-        $this->instituteId = $this->flash['studip_institute'];
+        $this->organisationId = $converisOrganisationId;
+        $this->instituteId = $studipInstituteId;
+
+        $this->templates = Config::get()->CONVERIS_REPORT_TEMPLATES;
 
         $currentMonth = date('m');
         if ($currentMonth < 10) {
             $this->startDate = '01.10.' . (date('Y') - 1);
             $this->endDate = '30.09.' . date('Y');
         } else {
-            $this->startDate = '01.10.' . ate('Y');
+            $this->startDate = '01.10.' . date('Y');
             $this->endDate = '30.09.' . (date('Y') + 1);
         }
     }
 
     /**
-     * Generates a PDF export in the format preferred by FIM faculty.
+     * Create an export by using the specified template.
      */
-    public function pdf_fim_action()
+    public function create_action()
     {
-        SimpleORMap::expireTableScheme();
+        $response = $this->relay('export/' . Request::option('template'),
+            Request::get('start_date'), Request::get('end_date'),
+            Request::option('institute_id'), Request::int('organisation_id'));
+        $this->body = $response->body;
+        $this->render_text($this->body);
+    }
 
-        $this->start = Request::get('start_date');
-        $this->end = Request::get('end_date');
+    /**
+     * Generates a PDF export in the format preferred by FIM faculty.
+     *
+     * @param string $start start of export time frame
+     * @param string $end end of export time frame
+     * @param string $studipInstituteId ID of chosen Stud.IP institute
+     * @param int $converisOrganisationId ID of chosen Converis organisation
+     */
+    public function pdf_fim_action($start, $end, $studipInstituteId, $converisOrganisationId)
+    {
+
+        PageLayout::postInfo('Stud.IP institute: ' . $studipInstituteId . ', Converis organisation: ' . $converisOrganisationId);
+
+        $this->start = $start;
+        $this->end = $end;
 
         $startDate = strtotime($this->start);
         $endDate = strtotime($this->end);
 
-        $this->institute = Institute::find(Request::option('institute_id'));
+        $this->institute = Institute::find($studipInstituteId);
 
         $projectRelations = SimpleCollection::createFromArray(
-            ConverisProjectOrganisationRelation::findByOrganisation_id(Request::int('organisation_id'))
+            ConverisProjectOrganisationRelation::findByOrganisation_id($converisOrganisationId)
         );
         $projects = ConverisProject::findBySQL(
             "`converis_id` IN (:ids) AND `type` = 'third_party' ORDER BY `long_name_1`, `long_name_2`",
@@ -122,7 +142,8 @@ class ExportController extends AuthenticatedController
             }
         }
 
-        $mpdf = new Mpdf();
+        $mpdf = new Mpdf(['orientation' => 'L']);
+        $mpdf->setFooter('Daten vom ' . date('d.m.Y H:i') . ', Seite {PAGENO}/{nb}');
         $mpdf->WriteHTML($this->render_template_as_string('export/pdf_fim'));
         $mpdf->Output('Drittmittelprojekte-' . $this->institute->name . '-' . $this->start . '-' . $this->end . '.pdf', 'D');
     }

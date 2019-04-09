@@ -23,7 +23,7 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
             $navigation = new Navigation($this->getDisplayName(),
                 PluginEngine::getURL($this, array(), 'projects'));
             $navigation->addSubNavigation('projects',
-                new Navigation(dgettext('converisplugin', 'Forschungsprojekte'),
+                new Navigation(dgettext('converisplugin', 'Einrichtung wählen'),
                     PluginEngine::getURL($this, array(), 'projects')));
             Navigation::addItem('/tools/converisprojects', $navigation);
         }
