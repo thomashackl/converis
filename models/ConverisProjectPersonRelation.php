@@ -34,14 +34,19 @@ class ConverisProjectPersonRelation extends SimpleORMap
     protected static function configure($config = array())
     {
         $config['db_table'] = 'converis_project_person';
-        $config['belongs_to']['projects'] = [
+        $config['belongs_to']['project'] = [
             'class_name' => 'ConverisProject',
             'foreign_key' => 'project_id',
             'assoc_foreign_key' => 'converis_id'
         ];
-        $config['belongs_to']['persons'] = [
+        $config['belongs_to']['person'] = [
             'class_name' => 'ConverisPerson',
             'foreign_key' => 'person_id',
+            'assoc_foreign_key' => 'converis_id'
+        ];
+        $config['has_one']['role_object'] = [
+            'class_name' => 'ConverisRole',
+            'foreign_key' => 'role',
             'assoc_foreign_key' => 'converis_id'
         ];
         parent::configure($config);

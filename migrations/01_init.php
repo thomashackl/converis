@@ -4,6 +4,28 @@ class Init extends Migration {
 
     public function up()
     {
+
+        // Admin accounts (roots do always have full access)
+        DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_admins`
+        (
+            `admin_id` INT NOT NULL AUTO_INCREMENT,
+            `username` VARCHAR(32) REFERENCES `auth_user_md5`.`username`,
+            `type` ENUM('global', 'local') NOT NULL DEFAULT 'local',
+            `mkdate` DATETIME NOT NULL,
+            `chdate` DATETIME NOT NULL,
+            PRIMARY KEY (`admin_id`)
+        ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
+
+        // Assign local admin accounts to institutes.
+        DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_admin_institute`
+        (
+            `admin_id` INT NOT NULL REFERENCES `converis_admins`.`admin_id`,
+            `institute_id` VARCHAR(32) REFERENCES `Institute`.`Institut_id`,
+            `mkdate` DATETIME NOT NULL,
+            `chdate` DATETIME NOT NULL,
+            PRIMARY KEY (`admin_id`, `institute_id`)
+        ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
+
         // Applications
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_applications`
         (
@@ -275,7 +297,7 @@ class Init extends Migration {
             ));
             Config::get()->create('CONVERIS_REPORT_TEMPLATES', array(
                 'value' => json_encode([
-                    'pdf_fim' => ['name' => 'Forschungsbericht FIM', 'action' => 'pdf_fim', 'format' => 'pdf']
+                    'pdf_fim' => ['name' => 'Forschungsbericht FIM', 'action' => 'pdf_fim']
                 ]),
                 'type' => 'array',
                 'range' => 'global',

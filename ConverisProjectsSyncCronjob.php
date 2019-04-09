@@ -248,15 +248,16 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     p.ldap_person_id AS username,
                     p.first_name,
                     p.last_name,
-                    c.value_1 AS academic_title,
+                    c2.value_1 AS academic_title,
                     CASE
-                        WHEN c.value = 'Internal' THEN 0
-                        WHEN c.value = 'External' THEN 1
+                        WHEN c1.value = 'Internal' THEN 0
+                        WHEN c1.value = 'External' THEN 1
                     END AS external,
                     p.c_created_on AS mkdate,
                     p.c_updated_on AS chdate
                 FROM iot_person p
-                    LEFT JOIN choicegroupvalue c ON (c.id = p.external)
+                    LEFT JOIN choicegroupvalue c1 ON (c1.id = p.external)
+                    LEFT JOIN choicegroupvalue c2 ON (c2.id = p.academic_title)
                 WHERE p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
                 ORDER BY converis_id",
                 'ConverisPerson'
@@ -315,14 +316,49 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
-                JOIN rel_card_has_project_int pi ON (pi.role = c.id)
+                    JOIN rel_card_has_project_int pi ON (pi.role = c.id)
                 UNION
                 SELECT DISTINCT
                     c.id AS converis_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
-                    LEFT JOIN rel_orga_has_proj_ext oe ON (oe.role = c.id)
+                    JOIN rel_card_has_proj_frin pi ON (pi.role = c.id)
+                UNION
+                SELECT DISTINCT
+                    c.id AS converis_id,
+                    c.value_1 AS name_1,
+                    c.value_2 AS name_2
+                FROM choicegroupvalue c
+                    JOIN rel_orga_has_proj_ext oe ON (oe.role = c.id)
+                UNION
+                SELECT DISTINCT
+                    c.id AS converis_id,
+                    c.value_1 AS name_1,
+                    c.value_2 AS name_2
+                FROM choicegroupvalue c
+                    JOIN rel_organisation_has_project_internal oe ON (oe.role = c.id)
+                UNION
+                SELECT DISTINCT
+                    c.id AS converis_id,
+                    c.value_1 AS name_1,
+                    c.value_2 AS name_2
+                FROM choicegroupvalue c
+                    JOIN rel_orga_has_proj_ext oe ON (oe.role = c.id)
+                UNION
+                SELECT DISTINCT
+                    c.id AS converis_id,
+                    c.value_1 AS name_1,
+                    c.value_2 AS name_2
+                FROM choicegroupvalue c
+                    JOIN rel_orga_has_proj_frex oe ON (oe.role = c.id)
+                UNION
+                SELECT DISTINCT
+                    c.id AS converis_id,
+                    c.value_1 AS name_1,
+                    c.value_2 AS name_2
+                FROM choicegroupvalue c
+                    JOIN rel_orga_has_proj_frin oe ON (oe.role = c.id)
                 ORDER BY converis_id",
                 'ConverisRole',
                 'converis_id',

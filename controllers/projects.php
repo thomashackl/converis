@@ -20,7 +20,7 @@ class ProjectsController extends AuthenticatedController {
      * Actions and settings taking place before every page call.
      */
     public function before_filter(&$action, &$args) {
-        if ($GLOBALS['perm']->have_perm('root') || in_array($GLOBALS['user']->username, ['hackl10', 'kuchle03', 'zukows02'])) {
+        if ($GLOBALS['perm']->have_perm('root') || ConverisAdmin::findByUsername($GLOBALS['user']->username)) {
             $this->plugin = $this->dispatcher->plugin;
             $this->flash = Trails_Flash::instance();
 
@@ -43,6 +43,8 @@ class ProjectsController extends AuthenticatedController {
             }
             PageLayout::addStylesheet($style);
 
+            Navigation::activateItem('/tools/converisprojects/projects');
+
         } else {
             throw new AccessDeniedException();
         }
@@ -56,7 +58,6 @@ class ProjectsController extends AuthenticatedController {
     {
         PageLayout::setTitle($this->plugin->getDisplayName() . ' - ' .
             dgettext('converisplugin', 'Einrichtung wählen'));
-        Navigation::activateItem('/tools/converisprojects/projects');
 
         $this->institutes = Institute::getInstitutes();
     }
@@ -67,8 +68,6 @@ class ProjectsController extends AuthenticatedController {
     public function list_action($institute_id = '')
     {
         $this->institute = Institute::find($institute_id != '' ? $institute_id : Request::option('institute'));
-
-        $this->flash['institute'] = $this->institute->id;
 
         PageLayout::setTitle(
             sprintf(dgettext('converisplugin', 'Liste der Forschungsprojekte für %s'),
@@ -101,20 +100,4 @@ class ProjectsController extends AuthenticatedController {
         }
     }
 
-    // customized #url_for for plugins
-    public function url_for($to = '') {
-        $args = func_get_args();
-
-        # find params
-        $params = array();
-        if (is_array(end($args))) {
-            $params = array_pop($args);
-        }
-
-        # urlencode all but the first argument
-        $args = array_map("urlencode", $args);
-        $args[0] = $to;
-
-        return PluginEngine::getURL($this->plugin, $params, join("/", $args));
-    }
 }
