@@ -135,11 +135,11 @@
                         <?= htmlReady($p->abstract_1 ?: $p->abstract_2) ?>
                     </td>
                     <td class="number">
-                        <?= htmlReady($p->third_party_data->funding_amount) ?>
+                        <?= number_format(htmlReady($p->third_party_data->funding_amount), 2, ',', '.') ?>
                         <?= htmlReady($p->third_party_data->funding_amount_cur) ?>
                     </td>
                     <td class="number">
-                        <?= htmlReady($p->third_party_data->funding_chair) ?>
+                        <?= number_format(htmlReady($p->third_party_data->funding_chair), 2, ',', '.') ?>
                         <?= htmlReady($p->third_party_data->funding_chair_cur) ?>
                     </td>
                     <td>
