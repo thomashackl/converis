@@ -169,9 +169,13 @@
                     <td>
                         <?= htmlReady($p->project_status->name_1) ?>
                         <br>
-                        <?= htmlReady(date('d.m.Y', strtotime($p->start_date))) ?>
-                        -
-                        <?= htmlReady(date('d.m.Y', strtotime($p->end_date))) ?>
+                        <?php if (strtotime($p->start_date) > 0) : ?>
+                            <?= htmlReady(date('d.m.Y', strtotime($p->start_date))) ?>
+                        <?php endif ?>
+                        <?php if (strtotime($p->end_date) > 0) : ?>
+                            <?= dgettext( 'converisplugin', 'bis') ?>
+                            <?= htmlReady(date('d.m.Y', strtotime($p->end_date))) ?>
+                        <?php endif ?>
                     </td>
                 </tr>
                 <?php endforeach ?>
