@@ -15,7 +15,7 @@
 class ConverisPerson extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_persons';
         $config['has_many']['related_projects'] = [

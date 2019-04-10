@@ -27,7 +27,7 @@
 class ConverisApplication extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_applications';
         parent::configure($config);

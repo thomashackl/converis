@@ -15,7 +15,7 @@
 class ConverisProjectStatus extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_project_status';
         parent::configure($config);

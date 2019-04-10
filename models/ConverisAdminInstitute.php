@@ -22,7 +22,7 @@
 class ConverisAdminInstitute extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_admin_institute';
         parent::configure($config);

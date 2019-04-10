@@ -16,7 +16,7 @@
 class ConverisProjectSourceOfFundsRelation extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_project_source_of_funds';
         $config['belongs_to']['source_of_funds'] = [

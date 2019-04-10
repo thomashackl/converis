@@ -15,7 +15,7 @@
 class ConverisOrganisation extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_organisations';
         parent::configure($config);

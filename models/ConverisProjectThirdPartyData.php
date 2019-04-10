@@ -16,7 +16,7 @@
 class ConverisProjectThirdPartyData extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_projects_third_party_data';
         $config['belongs_to']['project'] = [

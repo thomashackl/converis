@@ -21,19 +21,19 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
         // Plugin only available for roots or role.
         if ($GLOBALS['perm']->have_perm('root') || ConverisAdmin::findByUsername($GLOBALS['user']->username)) {
             $navigation = new Navigation($this->getDisplayName(),
-                PluginEngine::getURL($this, array(), 'projects'));
+                PluginEngine::getURL($this, [], 'projects'));
 
             $navigation->addSubNavigation('projects',
                 new Navigation(dgettext('converisplugin', 'Forschungsprojekte'),
-                    PluginEngine::getURL($this, array(), 'projects')));
+                    PluginEngine::getURL($this, [], 'projects')));
 
             if ($GLOBALS['perm']->have_perm('root')) {
                 $navigation->addSubNavigation('templates',
                     new Navigation(dgettext('converisplugin', 'Berichtsvorlagen'),
-                        PluginEngine::getURL($this, array(), 'settings/templates')));
+                        PluginEngine::getURL($this, [], 'settings/templates')));
                 $navigation->addSubNavigation('admins',
                     new Navigation(dgettext('converisplugin', 'Berechtigungen'),
-                        PluginEngine::getURL($this, array(), 'settings/admins')));
+                        PluginEngine::getURL($this, [], 'settings/admins')));
             }
 
             Navigation::addItem('/tools/converisprojects', $navigation);
@@ -52,7 +52,7 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
     public function perform($unconsumed_path) {
         $dispatcher = new Trails_Dispatcher(
             $this->getPluginPath(),
-            rtrim(PluginEngine::getLink($this, array(), null), '/'),
+            rtrim(PluginEngine::getLink($this, [], null), '/'),
             'projects'
         );
         $dispatcher->plugin = $this;

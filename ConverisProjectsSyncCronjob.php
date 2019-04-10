@@ -32,7 +32,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
     /**
      * Empty local database and fetch all content from Converis tables.
      */
-    public function execute($last_result, $parameters = array()) {
+    public function execute($last_result, $parameters = []) {
 
         $host = Config::get()->CONVERIS_HOSTNAME;
         $database = Config::get()->CONVERIS_DATABASE;

@@ -49,7 +49,7 @@
 class ConverisProject extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_projects';
         $config['has_one']['project_status'] = [

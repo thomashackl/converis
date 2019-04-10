@@ -23,7 +23,7 @@
 class ConverisAdmin extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_admins';
         $config['belongs_to']['user'] = [

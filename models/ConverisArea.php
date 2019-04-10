@@ -15,7 +15,7 @@
 class ConverisArea extends SimpleORMap
 {
 
-    protected static function configure($config = array())
+    protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_areas';
         parent::configure($config);

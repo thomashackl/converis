@@ -267,35 +267,35 @@ class Init extends Migration {
         SimpleORMap::expireTableScheme();
 
         try {
-            Config::get()->create('CONVERIS_HOSTNAME', array(
+            Config::get()->create('CONVERIS_HOSTNAME', [
                 'value' => 'converis.host.name',
                 'type' => 'string',
                 'range' => 'global',
                 'section' => 'converisplugin',
                 'description' => 'Adresse des Converis-Servers'
-            ));
-            Config::get()->create('CONVERIS_DB_USER', array(
+            ]);
+            Config::get()->create('CONVERIS_DB_USER', [
                 'value' => 'username',
                 'type' => 'string',
                 'range' => 'global',
                 'section' => 'converisplugin',
                 'description' => 'Benutzername für die Datenbankverbindung'
-            ));
-            Config::get()->create('CONVERIS_DB_PASSWORD', array(
+            ]);
+            Config::get()->create('CONVERIS_DB_PASSWORD', [
                 'value' => 'secret',
                 'type' => 'string',
                 'range' => 'global',
                 'section' => 'converisplugin',
                 'description' => 'Passwort für die Datenbankverbindung'
-            ));
-            Config::get()->create('CONVERIS_DATABASE', array(
+            ]);
+            Config::get()->create('CONVERIS_DATABASE', [
                 'value' => 'converisdb',
                 'type' => 'string',
                 'range' => 'global',
                 'section' => 'converisplugin',
                 'description' => 'Name der Converis-Datenbank'
-            ));
-            Config::get()->create('CONVERIS_REPORT_TEMPLATES', array(
+            ]);
+            Config::get()->create('CONVERIS_REPORT_TEMPLATES', [
                 'value' => json_encode([
                     'pdf_fim' => ['name' => 'Forschungsbericht FIM', 'action' => 'pdf_fim']
                 ]),
@@ -303,7 +303,7 @@ class Init extends Migration {
                 'range' => 'global',
                 'section' => 'converisplugin',
                 'description' => 'Verfügbare Vorlage für Forschungsberichte'
-            ));
+            ]);
         } catch (InvalidArgumentException $e) {}
     }
 
