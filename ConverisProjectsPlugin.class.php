@@ -18,6 +18,9 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
 
     public function __construct() {
         parent::__construct();
+
+        StudipAutoloader::addAutoloadPath(__DIR__ . '/models');
+
         // Plugin only available for roots or role.
         if ($GLOBALS['perm']->have_perm('root') || ConverisAdmin::findByUsername($GLOBALS['user']->username)) {
             $navigation = new Navigation($this->getDisplayName(),
@@ -38,8 +41,6 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
 
             Navigation::addItem('/tools/converisprojects', $navigation);
         }
-
-        StudipAutoloader::addAutoloadPath(__DIR__ . '/models');
     }
 
     /**
