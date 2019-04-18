@@ -73,12 +73,7 @@ class ProjectsController extends AuthenticatedController {
             sprintf(dgettext('converisplugin', 'Liste der Forschungsprojekte für %s'),
                 $this->institute->name));
 
-        $converisOrganisation = ConverisOrganisation::findOneByName_1($this->institute->name);
-
-        $projectRelations = SimpleCollection::createFromArray(
-            ConverisProjectOrganisationRelation::findByOrganisation_id($converisOrganisation->converis_id)
-        );
-        $this->projects = ConverisProject::findManyByConveris_id($projectRelations->pluck('project_id'));
+        $this->projects = ConverisProject::findByOrganisationName($this->institute->name);
 
         $views = new ViewsWidget();
         $views->addLink(

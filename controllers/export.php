@@ -89,13 +89,7 @@ class ExportController extends AuthenticatedController
 
         $this->institute = Institute::find($studipInstituteId);
 
-        $projectRelations = SimpleCollection::createFromArray(
-            ConverisProjectOrganisationRelation::findByOrganisation_id($converisOrganisationId)
-        );
-        $projects = ConverisProject::findBySQL(
-            "`converis_id` IN (:ids) AND `type` = 'third_party' ORDER BY `long_name_1`, `long_name_2`",
-            ['ids' => $projectRelations->pluck('project_id')]
-        );
+        $projects = ConverisProject::findByOrganisationName($this->institute->name);
 
         /*
          * Filter found projects by specified time span. This cannot be done

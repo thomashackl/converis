@@ -40,10 +40,10 @@
  * @property ConverisProjectStatus project_status has_one ConverisProjectStatus
  * @property ConverisProjectThirdPartyData third_party_data has_one ConverisProjectThirdPartyData
  * @property ConverisApplication application has_one ConverisApplication
- * @property SimpleORMapCollection related_organisations has_many ConverisProjectOrganisationRelation
- * @property SimpleORMapCollection related_persons has_many ConverisProjectPersonRelation
- * @property SimpleORMapCollection areas has_many ConverisProjectArea
+ * @property SimpleORMapCollection related_cards has_many ConverisProjectCardRelation
+ * @property SimpleORMapCollection areas has_many ConverisArea
  * @property SimpleORMapCollection related_sources_of_funds has_many ConverisSourceOfFundsRelation
+ * @property SimpleORMapCollection organisations has_many ConverisOrganisation
  */
 
 class ConverisProject extends SimpleORMap
@@ -67,13 +67,8 @@ class ConverisProject extends SimpleORMap
             'foreign_key' => 'application_id',
             'assoc_foreign_key' => 'converis_id'
         ];
-        $config['has_many']['related_organisations'] = [
-            'class_name' => 'ConverisProjectOrganisationRelation',
-            'foreign_key' => 'converis_id',
-            'assoc_foreign_key' => 'project_id'
-        ];
-        $config['has_many']['related_persons'] = [
-            'class_name' => 'ConverisProjectPersonRelation',
+        $config['has_many']['related_cards'] = [
+            'class_name' => 'ConverisProjectCardRelation',
             'foreign_key' => 'converis_id',
             'assoc_foreign_key' => 'project_id'
         ];
@@ -89,13 +84,34 @@ class ConverisProject extends SimpleORMap
             'foreign_key' => 'converis_id',
             'assoc_foreign_key' => 'project_id'
         ];
+        $config['has_many']['organisations'] = [
+            'class_name' => 'ConverisOrganisation',
+            'assoc_func' => 'findByProject_id'
+        ];
         parent::configure($config);
+    }
+
+    public static function findByOrganisationName($name)
+    {
+        $projects = DBManager::get()->fetchAll("SELECT DISTINCT p.*
+            FROM `converis_organisations` o
+                JOIN `converis_card_organisation` co ON (co.`organisation_id` = o.`converis_id`)
+                JOIN `converis_project_card` pc ON (pc.`card_id` = co.`card_id`)
+                JOIN `converis_projects` p ON (p.`project_id` = pc.`project_id`)
+                JOIN `converis_project_status` s ON (s.`converis_id` = p.`status`)
+            WHERE o.`name_1` = :name
+            ORDER BY s.`name_1`, p.`name`",
+            ['name' => $name],
+            __CLASS__ . '::buildExisting'
+        );
+
+        return $projects;
     }
 
     public static function getMaxTimestamp()
     {
-        return DBManager::get()->fetchColumn(
-            "SELECT GREATEST(MAX(`mkdate`), MAX(`chdate`)) FROM `" . self::config('db_table') . "`");
+        return DBManager::get()->fetchColumn("SELECT IFNULL(GREATEST(MAX(`mkdate`), MAX(`chdate`)), '1970-01-01')
+            FROM `" . self::config('db_table') . "`");
     }
 
 }

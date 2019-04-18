@@ -20,23 +20,35 @@
             <tr>
                 <td><?= htmlReady($project->name) ?> (<?= $project->converis_id ?>)</td>
                 <td data-sort-value="<?= strtotime(htmlReady($project->start_date)) ?>">
-                    <?= htmlReady(strtotime($project->start_date) > 0 ? $project->start_date : '-') ?>
+                    <?= htmlReady(strtotime($project->start_date) > 0 ?
+                        date('d.m.Y', strtotime($project->start_date)) :
+                        '-') ?>
                 </td>
                 <td data-sort-value="<?= strtotime(htmlReady($project->end_date)) ?>">
-                    <?= htmlReady(strtotime($project->end_date) > 0 ? $project->end_date : '-') ?>
+                    <?= htmlReady(strtotime($project->end_date) > 0 ?
+                        date('d.m.Y', strtotime($project->end_date)) :
+                        '-') ?>
                 </td>
                 <td>
-                    <?php if ($project->related_persons != null && count($project->related_persons) > 0) : ?>
-                        <?php if (count($project->related_persons) == 1) : $rel = $project->related_persons->first() ?>
-                            <?= htmlReady(implode(' ', [$rel->person->academic_title, $rel->person->first_name, $rel->person->last_name])) ?>
+                    <?php if ($project->related_cards != null && count($project->related_cards) > 0) : ?>
+                        <?php if (count($project->related_cards) == 1) : $rel = $project->related_cards->first() ?>
+                            <?= htmlReady(implode(' ', [
+                                    $rel->card->person->academic_title,
+                                    $rel->card->person->first_name,
+                                    $rel->card->person->last_name
+                                ])) ?>
                             <?php if ($rel->role != 0) : ?>
                                 (<?= htmlReady($rel->role_object->name_1) ?>)
                             <?php endif ?>
                         <?php else : ?>
                             <ul>
-                                <?php foreach ($project->related_persons as $rel) : ?>
+                                <?php foreach ($project->related_cards as $rel) : ?>
                                     <li>
-                                        <?= htmlReady(implode(' ', [$rel->person->academic_title, $rel->person->first_name, $rel->person->last_name])) ?>
+                                        <?= htmlReady(implode(' ', [
+                                                $rel->card->person->academic_title,
+                                                $rel->card->person->first_name,
+                                                $rel->card->person->last_name
+                                        ])) ?>
                                         <?php if ($rel->role != 0) : ?>
                                             (<?= htmlReady($rel->role_object->name_1) ?>)
                                         <?php endif ?>

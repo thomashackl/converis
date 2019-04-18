@@ -1,7 +1,7 @@
 <?php
 /**
- * ConverisProjectPersonRelation.php
- * model class for relation between projects and persons from Converis
+ * ConverisProjectCardRelation.php
+ * model class for relation between projects and cards from Converis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -13,7 +13,7 @@
  * @category    ConverisProjects
  *
  * @property int project_id database column
- * @property int person_id database column
+ * @property int card_id database column
  * @property string type database column
  * @property int role database column
  * @property string start_date database column
@@ -28,20 +28,20 @@
  * @property SimpleORMapCollection persons has_and_belongs_to_many ConverisPerson
  */
 
-class ConverisProjectPersonRelation extends SimpleORMap
+class ConverisProjectCardRelation extends SimpleORMap
 {
 
     protected static function configure($config = [])
     {
-        $config['db_table'] = 'converis_project_person';
+        $config['db_table'] = 'converis_project_card';
         $config['belongs_to']['project'] = [
             'class_name' => 'ConverisProject',
             'foreign_key' => 'project_id',
             'assoc_foreign_key' => 'converis_id'
         ];
-        $config['belongs_to']['person'] = [
-            'class_name' => 'ConverisPerson',
-            'foreign_key' => 'person_id',
+        $config['belongs_to']['card'] = [
+            'class_name' => 'ConverisCard',
+            'foreign_key' => 'card_id',
             'assoc_foreign_key' => 'converis_id'
         ];
         $config['has_one']['role_object'] = [
@@ -54,8 +54,8 @@ class ConverisProjectPersonRelation extends SimpleORMap
 
     public static function getMaxTimestamp()
     {
-        return DBManager::get()->fetchColumn(
-            "SELECT GREATEST(MAX(`mkdate`), MAX(`chdate`)) FROM `" . self::config('db_table') . "`");
+        return DBManager::get()->fetchColumn("SELECT IFNULL(GREATEST(MAX(`mkdate`), MAX(`chdate`)), '1970-01-01')
+            FROM `" . self::config('db_table') . "`");
     }
 
 }

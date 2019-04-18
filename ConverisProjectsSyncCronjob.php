@@ -32,8 +32,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
     /**
      * Empty local database and fetch all content from Converis tables.
      */
-    public function execute($last_result, $parameters = []) {
-
+    public function execute($last_result, $parameters = [])
+    {
         $host = Config::get()->CONVERIS_HOSTNAME;
         $database = Config::get()->CONVERIS_DATABASE;
         $username = Config::get()->CONVERIS_DB_USER;
@@ -263,6 +263,38 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 'ConverisPerson'
             );
 
+            // Get cards.
+            $this->importConverisData(
+                "SELECT DISTINCT
+                    c.id AS converis_id,
+                    p.id AS person_id,
+                    CASE
+                        WHEN c1.value = 'Internal' THEN 0
+                        WHEN c1.value = 'External' THEN 1
+                        ELSE 0
+                    END AS external,
+                    c.address,
+                    c.email,
+                    c.fax,
+                    c3.value AS function,
+                    c.mobile,
+                    c.phone,
+                    c.url,
+                    c.organisation,
+                    c.payroll_lookup,
+                    c.c_created_on AS mkdate,
+                    c.c_updated_on AS chdate
+                FROM iot_card c
+                    JOIN rel_pers_has_card pc ON (pc.iot_card = c.id)
+                    JOIN iot_person p ON (p.id = pc.iot_person)
+                    LEFT JOIN choicegroupvalue c1 ON (c1.id = c.external)
+                    LEFT JOIN choicegroupvalue c2 ON (c2.id = p.academic_title)
+                    LEFT JOIN choicegroupvalue c3 ON (c3.id = c.function)
+                WHERE c.c_created_on > :tstamp OR c.c_updated_on > :tstamp
+                ORDER BY converis_id",
+                'ConverisCard'
+            );
+
             // Get areas.
             $this->importConverisData(
                 "SELECT DISTINCT
@@ -365,84 +397,42 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 false
             );
 
-            // Connect projects and organisations
-            $this->importConverisData(
+            // Connect cards and organisations
+            $this->importRawConverisData(
                 "SELECT DISTINCT
-                    iot_project AS project_id,
+                    iot_card AS card_id,
                     iot_organisation AS organisation_id,
-                    'internal' AS type,
-                    role,
-                    start_date,
-                    end_date,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
-                FROM rel_organisation_has_project_internal
+                FROM rel_card_has_orga
                     WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
-                UNION
-                SELECT DISTINCT
-                    iot_project AS project_id,
-                    iot_organisation AS organisation_id,
-                    'external' AS type,
-                    role,
-                    start_date,
-                    end_date,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM rel_orga_has_proj_ext
-                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
-                UNION
-                SELECT DISTINCT
-                    iot_project_general AS project_id,
-                    iot_organisation AS organisation_id,
-                    'internal' AS type,
-                    role,
-                    NULL::timestamp AS start_date,
-                    NULL::timestamp AS end_date,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM rel_orga_has_proj_frin
-                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
-                UNION
-                SELECT DISTINCT
-                    iot_project_general AS project_id,
-                    iot_organisation AS organisation_id,
-                    'external' AS type,
-                    role,
-                    NULL::timestamp AS start_date,
-                    NULL::timestamp AS end_date,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM rel_orga_has_proj_frex
-                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
-                ORDER BY project_id, organisation_id",
-                'ConverisProjectOrganisationRelation',
-                ['project_id', 'organisation_id']
+                ORDER BY card_id, organisation_id",
+                'converis_card_organisation'
             );
 
-            // Connect projects and persons
+            // Connect projects and cards
             $this->importConverisData(
                 "SELECT DISTINCT
-                    r.iot_project AS project_id,
-                    p.iot_person AS person_id,
+                    iot_project AS project_id,
+                    iot_card AS card_id,
                     'internal' AS type,
-                    r.role,
+                    role,
                     CASE
-                        WHEN r.junior_scientist THEN 1
+                        WHEN junior_scientist THEN 1
                         ELSE 0
                     END AS junior_scientist,
-                    r.contributed_share,
-                    r.percentage_of_funding,
-                    r.start_date,
-                    r.end_date,
-                    r.c_created_on AS mkdate,
-                    r.c_updated_on AS chdate
-                FROM rel_card_has_project_int r
-                    JOIN rel_pers_has_card p ON (p.iot_card = r.iot_card)
-                WHERE r.c_created_on > :tstamp OR r.c_updated_on > :tstamp
+                    contributed_share,
+                    percentage_of_funding,
+                    start_date,
+                    end_date,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_card_has_project_int
+                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
                 UNION
                 SELECT DISTINCT
-                    r.iot_project AS project_id,
-                    p.iot_person AS person_id,
+                    iot_project AS project_id,
+                    iot_card AS person_id,
                     'external' AS type,
                     NULL::int AS role,
                     0 AS junior_scientist,
@@ -450,31 +440,29 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     NULL::numeric AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
-                    r.c_created_on AS mkdate,
-                    r.c_updated_on AS chdate
-                FROM rel_card_has_project_ext r
-                    JOIN rel_pers_has_card p ON (p.iot_card = r.iot_card)
-                WHERE r.c_created_on > :tstamp OR r.c_updated_on > :tstamp
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_card_has_project_ext
+                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
                 UNION
                 SELECT DISTINCT
-                    r.iot_project_general AS project_id,
-                    p.iot_person AS person_id,
+                    iot_project_general AS project_id,
+                    iot_card AS card_id,
                     'internal' AS type,
-                    r.role,
+                    role,
                     0 AS junior_scientist,
                     NULL::numeric AS contributed_share,
                     NULL::numeric AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
-                    r.c_created_on AS mkdate,
-                    r.c_updated_on AS chdate
-                FROM rel_card_has_proj_frin r
-                    JOIN rel_pers_has_card p ON (p.iot_card = r.iot_card)
-                WHERE r.c_created_on > :tstamp OR r.c_updated_on > :tstamp
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_card_has_proj_frin
+                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
                 UNION
                 SELECT DISTINCT
-                    r.iot_project_general AS project_id,
-                    p.iot_person AS person_id,
+                    iot_project_general AS project_id,
+                    iot_card AS card_id,
                     'external' AS type,
                     NULL::int AS role,
                     0 AS junior_scientist,
@@ -482,14 +470,13 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     NULL::numeric AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
-                    r.c_created_on AS mkdate,
-                    r.c_updated_on AS chdate
-                FROM rel_card_has_proj_frex r
-                    JOIN rel_pers_has_card p ON (p.iot_card = r.iot_card)
-                WHERE r.c_created_on > :tstamp OR r.c_updated_on > :tstamp
-                ORDER BY project_id, person_id",
-                'ConverisProjectPersonRelation',
-                ['project_id', 'person_id']
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_card_has_proj_frex
+                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                ORDER BY project_id, card_id",
+                'ConverisProjectCardRelation',
+                ['project_id', 'card_id']
             );
 
             // Connect projects and sources of funds.
@@ -507,11 +494,40 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 ['project_id', 'source_id']
             );
 
+            // Connect cards and areas
+            $this->importRawConverisData(
+                "SELECT DISTINCT
+                    iot_project AS project_id,
+                    iot_area AS area_id,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_area_has_project
+                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                UNION
+                SELECT DISTINCT
+                    iot_project_general AS project_id,
+                    iot_area AS area_id,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_area_has_proj_free
+                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                ORDER BY project_id, area_id",
+                'converis_project_area'
+            );
+
         } catch (Exception $e) {
             die($e->getMessage());
         }
     }
 
+    /**
+     * Imports data from converis by building corresponding Stud.IP SORM models.
+     *
+     * @param string $converisQuery the SQL query to execute against Converis DB
+     * @param string $studipModelName the Stud.IP SORM model class to use for object building
+     * @param string $checkKey db column used for checking whether an entry already exists in Stud.IP DB
+     * @param bool $checkTimestamp check mkdate/chdate in order to import only newer entries?
+     */
     private function importConverisData($converisQuery, $studipModelName, $checkKey = 'converis_id', $checkTimestamp = true)
     {
         //echo sprintf("Processing %s...\n", $studipModelName);
@@ -523,10 +539,10 @@ class ConverisProjectsSyncCronjob extends CronJob {
          * thus defining last successful import
          */
         if ($checkTimestamp) {
-            $tstamp = $studipModelName::getMaxTimestamp() ?: '1970-01-01';
+            $tstamp = $studipModelName::getMaxTimestamp();
             $parameters[':tstamp'] = $tstamp;
 
-            $converisQuery = str_replace(':tstamp', "'" . $tstamp . "'", $converisQuery);
+            //$converisQuery = str_replace(':tstamp', "'" . $tstamp . "'", $converisQuery);
         }
 
         //echo sprintf("Query:\n%s\n", $converisQuery);
@@ -560,6 +576,77 @@ class ConverisProjectsSyncCronjob extends CronJob {
             $object = $studipModelName::build($one, $studipModelName::countBySQL($sql, $params) == 0);
             $object->store();
         }
+    }
+
+    /**
+     * Imports data from converis by writing directly to Stud.IP database tables.
+     *
+     * @param string $converisQuery the SQL query to execute against Converis DB
+     * @param string $studipTable database table to insert entries to.
+     * @param bool $checkTimestamp check mkdate/chdate in order to import only newer entries?
+     */
+    private function importRawConverisData($converisQuery, $studipTable, $checkTimestamp = true)
+    {
+        //echo sprintf("Raw processing %s...\n", $studipTable);
+        $stmt = $this->converis->prepare($converisQuery);
+        $parameters = [];
+
+        /*
+         * Fetch maximal mkdate or chdate from table,
+         * thus defining last successful import
+         */
+        if ($checkTimestamp) {
+            $tstamp = DBManager::get()->fetchColumn(
+                "SELECT IFNULL(GREATEST(MAX(`mkdate`), MAX(`chdate`)), '1970-01-01') FROM `" . $studipTable . "`");
+            $parameters[':tstamp'] = $tstamp;
+
+            $converisQuery = str_replace(':tstamp', "'" . $tstamp . "'", $converisQuery);
+        }
+
+        //echo sprintf("Converis query:\n%s\n", $converisQuery);
+
+        $stmt->execute($parameters);
+        $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        //echo sprintf("Found %u entries in Converis.\n\n", count($entries));
+
+        if (count($entries) > 0) {
+            $columns = array_keys($entries[0]);
+
+            $columnList = $paramList = $updatelist = [];
+            foreach ($columns as $name) {
+                $columnList[] = '`' . $name . '`';
+                $paramList[] = ':' . $name;
+                $updateList[] = '`' . $name . '` = :' . $name;
+            }
+
+            $insert = "INSERT INTO `". $studipTable . "` (:columns) VALUES (:values) ON DUPLICATE KEY UPDATE :updates";
+
+            $insert = str_replace(':columns', implode(', ', $columnList), $insert);
+            $insert = str_replace(':values', implode(', ', $paramList), $insert);
+            $insert = str_replace(':updates', implode(', ', $updateList), $insert);
+
+            //echo sprintf("Insert query:\n%s\n", $insert);
+
+            $stmt = DBManager::get()->prepare($insert);
+
+            foreach ($entries as $one) {
+
+                $params = [];
+
+                $studipQuery = $insert;
+
+                foreach ($one as $column => $value) {
+                    $params[$column] = html_entity_decode(strip_tags($value));
+                    //$studipQuery = str_replace(':' . $column, "'" . $value . "'", $studipQuery);
+                }
+
+                //echo $studipQuery . "\n";
+
+                $stmt->execute($params);
+            }
+        }
+
     }
 
 }

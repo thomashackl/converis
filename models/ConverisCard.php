@@ -1,7 +1,6 @@
 <?php
 /**
- * ConverisProjectSourceOfFundsRelation.php
- * model class for relation between projects and organisations from Converis
+ * ConverisCard.php - model class for cards from Converis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -13,21 +12,22 @@
  * @category    ConverisProjects
  */
 
-class ConverisProjectSourceOfFundsRelation extends SimpleORMap
+class ConverisCard extends SimpleORMap
 {
 
     protected static function configure($config = [])
     {
-        $config['db_table'] = 'converis_project_source_of_funds';
-        $config['belongs_to']['source_of_funds'] = [
-            'class_name' => 'ConverisSourceOfFunds',
-            'foreign_key' => 'source_id',
+        $config['db_table'] = 'converis_cards';
+        $config['belongs_to']['person'] = [
+            'class_name' => 'ConverisPerson',
+            'foreign_key' => 'person_id',
             'assoc_foreign_key' => 'converis_id'
         ];
-        $config['belongs_to']['project'] = [
-            'class_name' => 'ConverisProject',
-            'foreign_key' => 'project_id',
-            'assoc_foreign_key' => 'converis_id'
+        $config['belongs_to']['organisation'] = [
+            'class_name' => 'ConverisOrganisation',
+            'thru_table' => 'converis_card_organisation',
+            'thru_key' => 'organisation_id',
+            'thru_assoc_key' => 'converis_id'
         ];
         parent::configure($config);
     }

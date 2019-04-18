@@ -23,8 +23,8 @@ class ConverisArea extends SimpleORMap
 
     public static function getMaxTimestamp()
     {
-        return DBManager::get()->fetchColumn(
-            "SELECT GREATEST(MAX(`mkdate`), MAX(`chdate`)) FROM `" . self::config('db_table') . "`");
+        return DBManager::get()->fetchColumn("SELECT IFNULL(GREATEST(MAX(`mkdate`), MAX(`chdate`)), '1970-01-01')
+            FROM `" . self::config('db_table') . "`");
     }
 
 }

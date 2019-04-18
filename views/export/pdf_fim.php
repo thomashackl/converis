@@ -144,23 +144,15 @@
                     </td>
                     <td>
                         <?php
-                            $orga = $p->related_organisations->filter(function($one) {
-                                return $one->type == 'internal';
-                            });
+                            $orga = ConverisOrganisation::findByProject_id($p->id, 'internal');
                         ?>
-                        <?php if (count($orga) == 1) : $one = $orga->first(); ?>
-                            <?= htmlReady($one->organisation->name_1) ?>
-                            <?php if ($one->role != '') : ?>
-                                (<?= htmlReady($one->role_object->name_1) ?>)
-                            <?php endif ?>
+                        <?php if (count($orga) == 1) : $one = $orga[0]; ?>
+                            <?= htmlReady($one->name_1) ?>
                         <?php else : ?>
                             <ul>
                                 <?php foreach ($orga as $one) :?>
                                 <li>
-                                    <?= htmlReady($one->organisation->name_1) ?>
-                                    <?php if ($one->role != '') : ?>
-                                        (<?= htmlReady($one->role_object->name_1) ?>)
-                                    <?php endif ?>
+                                    <?= htmlReady($one->name_1) ?>
                                 </li>
                                 <?php endforeach ?>
                             </ul>
