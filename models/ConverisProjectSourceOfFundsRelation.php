@@ -11,6 +11,14 @@
  * @author      Thomas Hackl <thomas.hackl@uni-passau.de>
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
+ * @property string project_id database column
+ * @property string source_id database column
+ * @property string amount database column
+ * @property string mkdate database column
+ * @property string chdate database column
+ * @property string id computed column read/write
+ * @property ConverisSourceOfFunds source_of_funds belongs_to ConverisSourceOfFunds
+ * @property ConverisProject project belongs_to ConverisProject
  */
 
 class ConverisProjectSourceOfFundsRelation extends SimpleORMap

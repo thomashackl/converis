@@ -10,6 +10,17 @@
  * @author      Thomas Hackl <thomas.hackl@uni-passau.de>
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
+ * @property string person_id database column
+ * @property string id alias column for person_id
+ * @property string converis_id database column
+ * @property string username database column
+ * @property string first_name database column
+ * @property string last_name database column
+ * @property string academic_title database column
+ * @property string external database column
+ * @property string mkdate database column
+ * @property string chdate database column
+ * @property SimpleORMapCollection cards has_many ConverisCard
  */
 
 class ConverisPerson extends SimpleORMap

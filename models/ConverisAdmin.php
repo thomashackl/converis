@@ -12,12 +12,14 @@
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
  *
- * @property int admin_id database column
+ * @property string admin_id database column
+ * @property string id alias column for admin_id
  * @property string username database column
  * @property string type database column
  * @property string mkdate database column
- * @property string chdate database colum
- * @property string id computed column read/write
+ * @property string chdate database column
+ * @property User user belongs_to User
+ * @property SimpleORMapCollection institutes has_and_belongs_to_many Institute
  */
 
 class ConverisAdmin extends SimpleORMap

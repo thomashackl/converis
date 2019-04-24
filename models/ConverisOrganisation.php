@@ -11,9 +11,10 @@
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
  *
- * @property int organisation_id database column
- * @property int converis_id database column
- * @property int converis_organisations_id database column
+ * @property string organisation_id database column
+ * @property string id alias column for organisation_id
+ * @property string converis_id database column
+ * @property string converis_organisations_id database column
  * @property string name_1 database column
  * @property string name_2 database column
  * @property string short_description database column
@@ -27,9 +28,9 @@
  * @property string phone database column
  * @property string fax database column
  * @property string url database column
- * @property int external database column
+ * @property string external database column
  * @property string mkdate database column
- * @property string chdate database colum
+ * @property string chdate database column
  * @property SimpleORMapCollection cards has_many ConverisCard
  */
 

@@ -11,8 +11,9 @@
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
  *
- * @property int project_id database column
- * @property int converis_id database column
+ * @property string project_id database column
+ * @property string id alias column for project_id
+ * @property string converis_id database column
  * @property string type database column
  * @property string name database column
  * @property string long_name_1 database column
@@ -31,19 +32,18 @@
  * @property string url database column
  * @property string start_date database column
  * @property string end_date database column
- * @property int status database column
- * @property int is_public database column
- * @property int application_id database column
+ * @property string status database column
+ * @property string is_public database column
+ * @property string application_id database column
  * @property string mkdate database column
- * @property string chdate database colum
- * @property string id computed column read/write
+ * @property string chdate database column
+ * @property SimpleORMapCollection related_cards has_many ConverisProjectCardRelation
+ * @property SimpleORMapCollection areas has_many ConverisArea
+ * @property SimpleORMapCollection related_sources_of_funds has_many ConverisProjectSourceOfFundsRelation
+ * @property SimpleORMapCollection organisations has_many ConverisOrganisation
  * @property ConverisProjectStatus project_status has_one ConverisProjectStatus
  * @property ConverisProjectThirdPartyData third_party_data has_one ConverisProjectThirdPartyData
  * @property ConverisApplication application has_one ConverisApplication
- * @property SimpleORMapCollection related_cards has_many ConverisProjectCardRelation
- * @property SimpleORMapCollection areas has_many ConverisArea
- * @property SimpleORMapCollection related_sources_of_funds has_many ConverisSourceOfFundsRelation
- * @property SimpleORMapCollection organisations has_many ConverisOrganisation
  */
 
 class ConverisProject extends SimpleORMap

@@ -33,8 +33,7 @@
             </select>
         </section>
     </fieldset>
-    <input type="hidden" name="organisation_id" value="<?= $organisationId ?>">
-    <input type="hidden" name="institute_id" value="<?= $instituteId ?>">
+    <input type="hidden" name="target" value="<?= $target ?>">
     <footer data-dialog-button>
         <?= Studip\Button::createAccept(dgettext('converisplugin', 'Bericht erzeugen'), 'submit') ?>
         <?= Studip\LinkButton::createCancel(_('Abbrechen'), $controller->link_for('project/list', $organisationId)) ?>

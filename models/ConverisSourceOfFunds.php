@@ -10,6 +10,15 @@
  * @author      Thomas Hackl <thomas.hackl@uni-passau.de>
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
+ * @property string source_id database column
+ * @property string id alias column for source_id
+ * @property string converis_id database column
+ * @property string name database column
+ * @property string short_name database column
+ * @property string description database column
+ * @property string website database column
+ * @property string mkdate database column
+ * @property string chdate database column
  */
 
 class ConverisSourceOfFunds extends SimpleORMap

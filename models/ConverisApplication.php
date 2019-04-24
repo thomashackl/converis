@@ -11,8 +11,9 @@
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
  *
- * @property int application_id database column
- * @property int converis_id database column
+ * @property string application_id database column
+ * @property string id alias column for application_id
+ * @property string converis_id database column
  * @property string start_date database column
  * @property string end_date database column
  * @property string deadline database column
@@ -20,8 +21,7 @@
  * @property string funding_amount_cur database column
  * @property string commentary_financial_data database column
  * @property string mkdate database column
- * @property string chdate database colum
- * @property string id computed column read/write
+ * @property string chdate database column
  */
 
 class ConverisApplication extends SimpleORMap
