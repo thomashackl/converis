@@ -29,8 +29,7 @@ class Init extends Migration {
         // Applications
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_applications`
         (
-            `application_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `application_id` INT NOT NULL,
             `start_date` DATE NULL,
             `end_date` DATE NULL,
             `deadline` DATE NULL,
@@ -39,15 +38,13 @@ class Init extends Migration {
             `commentary_financial_data` TEXT NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`application_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`application_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Research projects.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_projects`
         (
-            `project_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `project_id` INT NOT NULL,
             `type` ENUM ('free', 'third_party') NOT NULL,
             `name` VARCHAR(500) NOT NULL,
             `long_name_1` VARCHAR(500) NULL,
@@ -68,20 +65,18 @@ class Init extends Migration {
             `end_date` DATE NULL,
             `status` INT NOT NULL DEFAULT 0,
             `is_public` INT NULL DEFAULT 0,
-            `application_id` INT NULL REFERENCES `converis_appliactions`.`converis_id`,
+            `application_id` INT NULL REFERENCES `converis_appliactions`.`application_id`,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`project_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`project_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Additional data for third party research projects.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_projects_third_party_data`
         (
-            `project_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `project_id` INT NOT NULL,
             `project_number` VARCHAR(100) NULL,
-            `project_type` INT NULL REFERENCES `converis_project_types`.`converis_id`,
+            `project_type` INT NULL REFERENCES `converis_project_types`.`type_id`,
             `doctoral_program` TINYINT(1) NOT NULL DEFAULT 0,
             `extension_until` DATETIME NULL,
             `stepped_into_running_project` DATETIME NULL,
@@ -113,48 +108,40 @@ class Init extends Migration {
             `commentary_funding` TEXT NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`project_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`project_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Names for project status.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_project_status`
         (
-            `status_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `status_id` INT NOT NULL,
             `name_1` VARCHAR(100) NOT NULL,
             `name_2` VARCHAR(100) NOT NULL,
-            PRIMARY KEY (`status_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`status_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Names for roles.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_roles`
         (
-            `role_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `role_id` INT NOT NULL,
             `name_1` VARCHAR(100) NOT NULL,
             `name_2` VARCHAR(100) NULL,
-            PRIMARY KEY (`role_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`role_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Names for project types.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_project_types`
         (
-            `type_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `type_id` INT NOT NULL,
             `name_1` VARCHAR(100) NOT NULL,
             `name_2` VARCHAR(100) NULL,
-            PRIMARY KEY (`type_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`type_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Organisations.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_organisations`
         (
-            `organisation_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `organisation_id` INT NOT NULL,
             `converis_organisations_id` INT NOT NULL,
             `name_1` VARCHAR(255) NOT NULL,
             `name_2` VARCHAR(255) NULL,
@@ -172,30 +159,26 @@ class Init extends Migration {
             `external` TINYINT(1) NOT NULL DEFAULT 0,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`organisation_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`organisation_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Areas.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_areas`
         (
-            `area_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `area_id` INT NOT NULL,
             `area_type` VARCHAR(100) NULL,
             `name_1` VARCHAR(255) NOT NULL,
             `name_2` VARCHAR(255) NULL,
             `short_description` VARCHAR(1024) NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`area_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`area_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Persons
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_persons`
         (
-            `person_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `person_id` INT NOT NULL,
             `username` VARCHAR(255) NULL,
             `first_name` VARCHAR(255) NOT NULL,
             `last_name` VARCHAR(255) NOT NULL,
@@ -203,16 +186,14 @@ class Init extends Migration {
             `external` TINYINT(1) NOT NULL DEFAULT 0,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`person_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`person_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Cards
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_cards`
         (
-            `card_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
-            `person_id` INT NOT NULL REFERENCES `converis_persons`.`converis_id`,
+            `card_id` INT NOT NULL,
+            `person_id` INT NOT NULL REFERENCES `converis_persons`.`person_id`,
             `external` TINYINT(1) NOT NULL DEFAULT 0,
             `address` VARCHAR(255) NULL,
             `email` VARCHAR(255) NULL,
@@ -225,30 +206,27 @@ class Init extends Migration {
             `payroll_lookup` VARCHAR(1024) NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`card_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`card_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Sources of funds.
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_sources_of_funds`
         (
-            `source_id` INT NOT NULL AUTO_INCREMENT,
-            `converis_id` INT NOT NULL,
+            `source_id` INT NOT NULL,
             `name` VARCHAR(255) NOT NULL,
             `short_name` VARCHAR(100) NULL,
             `description` TEXT NULL,
             `website` VARCHAR(255) NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`source_id`),
-            UNIQUE KEY (`converis_id`)
+            PRIMARY KEY (`source_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Relation card - organisation
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_card_organisation`
         (
-            `card_id` INT NOT NULL REFERENCES `converis_cards`.`converis_id`,
-            `organisation_id` INT NOT NULL REFERENCES `converis_organisations`.`converis_id`,
+            `card_id` INT NOT NULL REFERENCES `converis_cards`.`card_id`,
+            `organisation_id` INT NOT NULL REFERENCES `converis_organisations`.`organisation_id`,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
             PRIMARY KEY (`card_id`, `organisation_id`)
@@ -257,8 +235,8 @@ class Init extends Migration {
         // Relation area - project
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_project_area`
         (
-            `project_id` INT NOT NULL REFERENCES `converis_projects`.`converis_id`,
-            `area_id` INT NOT NULL REFERENCES `converis_areas`.`converis_id`,
+            `project_id` INT NOT NULL REFERENCES `converis_projects`.`project_id`,
+            `area_id` INT NOT NULL REFERENCES `converis_areas`.`area_id`,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
             PRIMARY KEY (`project_id`, `area_id`)
@@ -267,10 +245,10 @@ class Init extends Migration {
         // Relation project - card
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_project_card`
         (
-            `project_id` INT NOT NULL REFERENCES `converis_projects`.`converis_id`,
-            `card_id` INT NOT NULL REFERENCES `converis_cards`.`converis_id`,
+            `project_id` INT NOT NULL REFERENCES `converis_projects`.`project_id`,
+            `card_id` INT NOT NULL REFERENCES `converis_cards`.`card_id`,
             `type` ENUM ('internal', 'external'),
-            `role` INT NULL REFERENCES `converis_roles`.`converis_id`,
+            `role` INT NULL REFERENCES `converis_roles`.`role_id`,
             `start_date` DATE NULL,
             `end_date` DATE NULL,
             `junior_scientist` TINYINT(1) NOT NULL DEFAULT 0,
@@ -284,8 +262,8 @@ class Init extends Migration {
         // Relation project - source of funds
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_project_source_of_funds`
         (
-            `project_id` INT NOT NULL REFERENCES `converis_projects`.`converis_id`,
-            `source_id` INT NOT NULL REFERENCES `converis_sources_of_funds`.`converis_id`,
+            `project_id` INT NOT NULL REFERENCES `converis_projects`.`project_id`,
+            `source_id` INT NOT NULL REFERENCES `converis_sources_of_funds`.`source_id`,
             `amount` FLOAT(11,2) NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,

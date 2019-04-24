@@ -59,12 +59,12 @@ class ConverisProjectThirdPartyData extends SimpleORMap
         $config['db_table'] = 'converis_projects_third_party_data';
         $config['belongs_to']['project'] = [
             'class_name' => 'ConverisProject',
-            'foreign_key' => 'converis_id'
+            'foreign_key' => 'project_id'
         ];
         $config['has_one']['type'] = [
             'class_name' => 'ConverisProjectType',
             'foreign_key' => 'project_type',
-            'assoc_foreign_key' => 'converis_id'
+            'assoc_foreign_key' => 'type_id'
         ];
         parent::configure($config);
     }

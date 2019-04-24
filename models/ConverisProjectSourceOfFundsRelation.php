@@ -29,13 +29,11 @@ class ConverisProjectSourceOfFundsRelation extends SimpleORMap
         $config['db_table'] = 'converis_project_source_of_funds';
         $config['belongs_to']['source_of_funds'] = [
             'class_name' => 'ConverisSourceOfFunds',
-            'foreign_key' => 'source_id',
-            'assoc_foreign_key' => 'converis_id'
+            'foreign_key' => 'source_id'
         ];
         $config['belongs_to']['project'] = [
             'class_name' => 'ConverisProject',
-            'foreign_key' => 'project_id',
-            'assoc_foreign_key' => 'converis_id'
+            'foreign_key' => 'project_id'
         ];
         parent::configure($config);
     }

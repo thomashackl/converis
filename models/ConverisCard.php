@@ -38,19 +38,16 @@ class ConverisCard extends SimpleORMap
         $config['db_table'] = 'converis_cards';
         $config['belongs_to']['person'] = [
             'class_name' => 'ConverisPerson',
-            'foreign_key' => 'person_id',
-            'assoc_foreign_key' => 'converis_id'
+            'foreign_key' => 'person_id'
         ];
         $config['has_many']['related_projects'] = [
             'class_name' => 'ConverisProjectCardRelation',
-            'foreign_key' => 'converis_id',
-            'assoc_foreign_key' => 'card_id'
+            'foreign_key' => 'card_id'
         ];
-        $config['belongs_to']['organisation'] = [
+        $config['has_and_belongs_to_many']['organisation'] = [
             'class_name' => 'ConverisOrganisation',
             'thru_table' => 'converis_card_organisation',
-            'thru_key' => 'organisation_id',
-            'thru_assoc_key' => 'converis_id'
+            'thru_key' => 'organisation_id'
         ];
         parent::configure($config);
     }

@@ -43,8 +43,7 @@ class ConverisOrganisation extends SimpleORMap
         $config['has_many']['cards'] = [
             'class_name' => 'ConverisCard',
             'thru_table' => 'converis_card_organisation',
-            'thru_key' => 'converis_id',
-            'thru_assoc_key' => 'organisation_id'
+            'thru_key' => 'organisation_id'
         ];
         parent::configure($config);
     }

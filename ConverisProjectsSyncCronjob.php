@@ -48,7 +48,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
             // Import project status names.
             $this->importConverisData(
                 "SELECT DISTINCT
-                        c.id AS converis_id,
+                        c.id AS status_id,
                         c.value_1 AS name_1,
                         c.value_2 AS name_2
                     FROM iot_project p
@@ -57,7 +57,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     WHERE h.infoobjecttype = 36
                     UNION
                     SELECT DISTINCT
-                        c.id AS converis_id,
+                        c.id AS status_id,
                         c.value_1 AS name_1,
                         c.value_2 AS name_2
                     FROM iot_project_general p
@@ -66,14 +66,14 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     WHERE h.infoobjecttype = 36
                     ORDER BY name_1",
                 'ConverisProjectStatus',
-                'converis_id',
+                'status_id',
                 false
             );
 
             // Get applications.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    id AS converis_id,
+                    id AS application_id,
                     start_date,
                     end_date,
                     deadline,
@@ -84,14 +84,15 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     c_updated_on AS chdate
                 FROM iot_application
                 WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
-                ORDER BY id",
-                'ConverisApplication'
+                ORDER BY application_id",
+                'ConverisApplication',
+                'application_id'
             );
 
             // Get project data.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    p.id AS converis_id,
+                    p.id AS project_id,
                     p.name,
                     'free' AS type,
                     p.long_name__1 AS long_name_1,
@@ -123,7 +124,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     AND (p.c_created_on > :tstamp OR p.c_updated_on > :tstamp)
                 UNION
                 SELECT
-                    p.id AS converis_id,
+                    p.id AS project_id,
                     p.name,
                     'third_party' AS type,
                     p.long_name__1 AS long_name_1,
@@ -153,14 +154,15 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 WHERE p.name IS NOT NULL
                     AND s.infoobjecttype = 36
                     AND (p.c_created_on > :tstamp OR p.c_updated_on > :tstamp)
-                ORDER BY converis_id",
-                'ConverisProject'
+                ORDER BY project_id",
+                'ConverisProject',
+                'project_id'
             );
 
             // Get additional data for third party projects.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    p.id AS converis_id,
+                    p.id AS project_id,
                     project_number,
                     project_type,
                     CASE
@@ -211,14 +213,15 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     LEFT JOIN choicegroupvalue c10 ON (c10.id = p.funding_amount_cur)
                 WHERE s.infoobjecttype = 36
                     AND p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
-                ORDER BY converis_id",
-                'ConverisProjectThirdPartyData'
+                ORDER BY project_id",
+                'ConverisProjectThirdPartyData',
+                'project_id'
             );
 
             // Get organisations.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    o.id AS converis_id,
+                    o.id AS organisation_id,
                     o.name__1 AS name_1,
                     o.name__2 AS name_2,
                     o.c_short_description AS short_description,
@@ -242,14 +245,15 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     LEFT JOIN choicegroupvalue c ON (c.id = o.external_or_internal)
                 WHERE o.c_created_on > :tstamp OR o.c_updated_on > :tstamp
                     AND o.status_process < 4
-                ORDER BY converis_id",
-                'ConverisOrganisation'
+                ORDER BY organisation_id",
+                'ConverisOrganisation',
+                'organisation_id'
             );
 
             // Get persons.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    p.id AS converis_id,
+                    p.id AS person_id,
                     p.ldap_person_id AS username,
                     p.first_name,
                     p.last_name,
@@ -264,14 +268,15 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     LEFT JOIN choicegroupvalue c1 ON (c1.id = p.external)
                     LEFT JOIN choicegroupvalue c2 ON (c2.id = p.academic_title)
                 WHERE p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
-                ORDER BY converis_id",
-                'ConverisPerson'
+                ORDER BY person_id",
+                'ConverisPerson',
+                'person_id'
             );
 
             // Get cards.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS card_id,
                     p.id AS person_id,
                     CASE
                         WHEN c1.value = 'Internal' THEN 0
@@ -297,14 +302,15 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     LEFT JOIN choicegroupvalue c3 ON (c3.id = c.function)
                 WHERE c.c_created_on > :tstamp OR c.c_updated_on > :tstamp
                     AND c.status_process < 5
-                ORDER BY converis_id",
-                'ConverisCard'
+                ORDER BY card_id",
+                'ConverisCard',
+                'card_id'
             );
 
             // Get areas.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    a.id AS converis_id,
+                    a.id AS area_id,
                     a.name AS name_1,
                     a.name_en AS name_2,
                     a.c_short_description AS short_description,
@@ -314,14 +320,15 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     LEFT JOIN choicegroupvalue c ON (c.id = a.area_type)
                 WHERE a.c_created_on > :tstamp OR a.c_updated_on > :tstamp
                     AND a.status_process < 3
-                ORDER BY converis_id",
-                'ConverisArea'
+                ORDER BY area_id",
+                'ConverisArea',
+                'area_id'
             );
 
             // Get sources of funds.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    id AS converis_id,
+                    id AS source_id,
                     name,
                     short_name,
                     description,
@@ -331,77 +338,78 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 FROM iot_source_of_funds
                 WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
                     AND status_process < 3
-                ORDER BY converis_id",
-                'ConverisSourceOfFunds'
+                ORDER BY source_id",
+                'ConverisSourceOfFunds',
+                'source_id'
             );
 
             // Get project types.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS type_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN iot_project p ON (p.project_type = c.id)
                 ORDER BY c.id",
                 'ConverisProjectType',
-                'converis_id',
+                'type_id',
                 false
             );
 
             // Get roles.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS role_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_card_has_project_int pi ON (pi.role = c.id)
                 UNION
                 SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS role_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_card_has_proj_frin pi ON (pi.role = c.id)
                 UNION
                 SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS role_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_orga_has_proj_ext oe ON (oe.role = c.id)
                 UNION
                 SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS role_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_organisation_has_project_internal oe ON (oe.role = c.id)
                 UNION
                 SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS role_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_orga_has_proj_ext oe ON (oe.role = c.id)
                 UNION
                 SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS role_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_orga_has_proj_frex oe ON (oe.role = c.id)
                 UNION
                 SELECT DISTINCT
-                    c.id AS converis_id,
+                    c.id AS role_id,
                     c.value_1 AS name_1,
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_orga_has_proj_frin oe ON (oe.role = c.id)
-                ORDER BY converis_id",
+                ORDER BY role_id",
                 'ConverisRole',
-                'converis_id',
+                'role_id',
                 false
             );
 
@@ -543,9 +551,9 @@ class ConverisProjectsSyncCronjob extends CronJob {
      * @param string $checkKey db column used for checking whether an entry already exists in Stud.IP DB
      * @param bool $checkTimestamp check mkdate/chdate in order to import only newer entries?
      */
-    private function importConverisData($converisQuery, $studipModelName, $checkKey = 'converis_id', $checkTimestamp = true)
+    private function importConverisData($converisQuery, $studipModelName, $checkKey = 'id', $checkTimestamp = true)
     {
-        //echo sprintf("Processing %s...\n", $studipModelName);
+        //echo sprintf("Processing %s...\n\n", $studipModelName);
         $stmt = $this->converis->prepare($converisQuery);
         $parameters = [];
 
@@ -588,7 +596,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 $value = html_entity_decode(strip_tags($value));
             });
 
-            //echo sprintf("%u CountBySQL:<pre>%s</pre>\n", $one['converis_id'], print_r($studipModelName::countBySQL($sql, $params), 1));
+            //echo sprintf("%u CountBySQL:<pre>%s</pre>\n", $one[$checkKey], print_r($studipModelName::countBySQL($sql, $params), 1));
 
             $object = $studipModelName::build($one, $studipModelName::countBySQL($sql, $params) == 0);
             $object->store();

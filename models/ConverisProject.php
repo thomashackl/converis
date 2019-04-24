@@ -55,34 +55,29 @@ class ConverisProject extends SimpleORMap
         $config['has_one']['project_status'] = [
             'class_name' => 'ConverisProjectStatus',
             'foreign_key' => 'status',
-            'assoc_foreign_key' => 'converis_id'
+            'assoc_foreign_key' => 'status_id'
         ];
         $config['has_one']['third_party_data'] = [
             'class_name' => 'ConverisProjectThirdPartyData',
-            'foreign_key' => 'converis_id',
-            'assoc_foreign_key' => 'converis_id'
+            'foreign_key' => 'project_id'
         ];
         $config['has_one']['application'] = [
             'class_name' => 'ConverisApplication',
-            'foreign_key' => 'application_id',
-            'assoc_foreign_key' => 'converis_id'
+            'foreign_key' => 'application_id'
         ];
         $config['has_many']['related_cards'] = [
             'class_name' => 'ConverisProjectCardRelation',
-            'foreign_key' => 'converis_id',
-            'assoc_foreign_key' => 'project_id'
+            'foreign_key' => 'project_id'
         ];
         $config['has_many']['areas'] = [
             'class_name' => 'ConverisArea',
             'thru_table' => 'converis_project_area',
             'thru_key' => 'area_id',
-            'thru_assoc_key' => 'area_id',
             'order_by' => 'ORDER BY `name`',
         ];
         $config['has_many']['related_sources_of_funds'] = [
             'class_name' => 'ConverisProjectSourceOfFundsRelation',
-            'foreign_key' => 'converis_id',
-            'assoc_foreign_key' => 'project_id'
+            'foreign_key' => 'project_id'
         ];
         $config['has_many']['organisations'] = [
             'class_name' => 'ConverisOrganisation',
@@ -101,10 +96,10 @@ class ConverisProject extends SimpleORMap
     {
         $projects = DBManager::get()->fetchAll("SELECT DISTINCT p.*
             FROM `converis_projects` p
-                JOIN `converis_project_card` pc ON (pc.`project_id` = p.`converis_id`)
+                JOIN `converis_project_card` pc ON (pc.`project_id` = p.`project_id`)
                 JOIN `converis_card_organisation` co ON (co.`card_id` = pc.`card_id`)
-                JOIN `converis_organisations` o ON (o.`converis_id` = co.`organisation_id`)
-                JOIN `converis_project_status` s ON (s.`converis_id` = p.`status`)
+                JOIN `converis_organisations` o ON (o.`organisation_id` = co.`organisation_id`)
+                JOIN `converis_project_status` s ON (s.`status_id` = p.`status`)
             WHERE o.`name_1` = :name
             ORDER BY s.`name_1`, p.`name`",
             ['name' => $name],
@@ -124,10 +119,10 @@ class ConverisProject extends SimpleORMap
     {
         $projects = DBManager::get()->fetchAll("SELECT DISTINCT p.*
             FROM `converis_projects` p
-                JOIN `converis_project_card` pc ON (pc.`project_id` = p.`converis_id`)
-                JOIN `converis_cards` c ON (c.`converis_id` = pc.`card_id`)
-                JOIN `converis_persons` pers ON (pers.`converis_id` = c.`person_id`)
-                JOIN `converis_project_status` s ON (s.`converis_id` = p.`status`)
+                JOIN `converis_project_card` pc ON (pc.`project_id` = p.`project_id`)
+                JOIN `converis_cards` c ON (c.`card_id` = pc.`card_id`)
+                JOIN `converis_persons` pers ON (pers.`person_id` = c.`person_id`)
+                JOIN `converis_project_status` s ON (s.`status_id` = p.`status`)
             WHERE pers.`username` = :username
             ORDER BY s.`name_1`, p.`name`",
             ['username' => $username],
