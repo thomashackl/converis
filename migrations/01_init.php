@@ -67,7 +67,7 @@ class Init extends Migration {
             `start_date` DATE NULL,
             `end_date` DATE NULL,
             `status` INT NOT NULL DEFAULT 0,
-            `is_public` INT NULL,
+            `is_public` INT NULL DEFAULT 0,
             `application_id` INT NULL REFERENCES `converis_appliactions`.`converis_id`,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
@@ -302,6 +302,8 @@ class Init extends Migration {
                 'section' => 'converisplugin',
                 'description' => 'Adresse des Converis-Servers'
             ]);
+        } catch (InvalidArgumentException $e) {}
+        try {
             Config::get()->create('CONVERIS_DB_USER', [
                 'value' => 'username',
                 'type' => 'string',
@@ -309,6 +311,8 @@ class Init extends Migration {
                 'section' => 'converisplugin',
                 'description' => 'Benutzername für die Datenbankverbindung'
             ]);
+        } catch (InvalidArgumentException $e) {}
+        try {
             Config::get()->create('CONVERIS_DB_PASSWORD', [
                 'value' => 'secret',
                 'type' => 'string',
@@ -316,6 +320,8 @@ class Init extends Migration {
                 'section' => 'converisplugin',
                 'description' => 'Passwort für die Datenbankverbindung'
             ]);
+        } catch (InvalidArgumentException $e) {}
+        try {
             Config::get()->create('CONVERIS_DATABASE', [
                 'value' => 'converisdb',
                 'type' => 'string',
@@ -323,9 +329,28 @@ class Init extends Migration {
                 'section' => 'converisplugin',
                 'description' => 'Name der Converis-Datenbank'
             ]);
+        } catch (InvalidArgumentException $e) {}
+        try {
             Config::get()->create('CONVERIS_REPORT_TEMPLATES', [
                 'value' => json_encode([
-                    'pdf_fim' => ['name' => 'Forschungsbericht FIM', 'action' => 'pdf_fim']
+                    'institute' => [
+                        'pdf_fim' => [
+                            'name' => 'Forschungsbericht FIM',
+                            'action' => 'pdf_fim'
+                        ]
+                    ],
+                    'user' => [
+                        'xls_leistungsbezuege' => [
+                            'name' => 'Leistungsbezüge (Excel)',
+                            'type' => 'user',
+                            'action' => 'xls_leistungsbezuege'
+                        ],
+                        'pdf_leistungsbezuege' => [
+                            'name' => 'Leistungsbezüge (PDF)',
+                            'type' => 'user',
+                            'action' => 'pdf_leistungsbezuege'
+                        ]
+                    ]
                 ]),
                 'type' => 'array',
                 'range' => 'global',

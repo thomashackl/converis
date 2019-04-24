@@ -20,9 +20,10 @@ class ProjectsController extends AuthenticatedController {
      * Actions and settings taking place before every page call.
      */
     public function before_filter(&$action, &$args) {
+        $this->plugin = $this->dispatcher->plugin;
+        $this->flash = Trails_Flash::instance();
+
         if ($GLOBALS['perm']->have_perm('root') || ConverisAdmin::findByUsername($GLOBALS['user']->username)) {
-            $this->plugin = $this->dispatcher->plugin;
-            $this->flash = Trails_Flash::instance();
 
             if (Request::isXhr()) {
                 $this->set_layout(null);
@@ -38,10 +39,13 @@ class ProjectsController extends AuthenticatedController {
 
             if (Studip\ENV == 'development') {
                 $style = $this->plugin->getPluginURL().'/assets/stylesheets/converisplugin.css';
+                $js = $this->plugin->getPluginURL().'/assets/javascripts/converisplugin.js';
             } else {
-                $style = $this->plugin->getPluginURL().'/assets/stylesheets/converisplugin.min.css';
+                $css = $this->plugin->getPluginURL().'/assets/stylesheets/converisplugin.min.css';
+                $js = $this->plugin->getPluginURL().'/assets/javascripts/converisplugin.min.js';
             }
-            PageLayout::addStylesheet($style);
+            PageLayout::addStylesheet($css);
+            PageLayout::addScript($js);
 
             Navigation::activateItem('/tools/converisprojects/projects');
 
@@ -57,42 +61,81 @@ class ProjectsController extends AuthenticatedController {
     public function index_action()
     {
         PageLayout::setTitle($this->plugin->getDisplayName() . ' - ' .
-            dgettext('converisplugin', 'Einrichtung wählen'));
+            dgettext('converisplugin', 'Kontext auswählen'));
 
         $this->institutes = Institute::getInstitutes();
+
+        $this->usersearch = QuickSearch::get('user', new StandardSearch('username'))
+            ->withButton();
     }
 
     /**
-     * Loads research projects for a given institute from Converis.
+     * Loads research projects for a given institute or user from Converis.
      */
-    public function list_action($institute_id = '')
+    public function get_action()
     {
-        $this->institute = Institute::find($institute_id != '' ? $institute_id : Request::option('institute'));
+        SimpleORMap::expireTableScheme();
+        if (Request::option('type') === 'institute') {
+            $context = Request::option('institute_id');
+            $name = Institute::find($context)->name;
+            $projects = SimpleCollection::createFromArray(
+                ConverisProject::findByOrganisationName(Institute::find(Request::option('institute_id'))->name)
+            )->pluck('project_id');
+        } else {
+            $context = Request::username('user');
+            $name = User::findByUsername($context)->getFullname();
+            $projects = SimpleCollection::createFromArray(
+                ConverisProject::findByUsername(Request::username('user'))
+            )->pluck('project_id');
+        }
+
+        if (count($projects) > 0) {
+            $this->flash['type'] = Request::option('type');
+            $this->flash['context'] = $context;
+            $this->flash['projects'] = $projects;
+            $this->relocate('projects/list');
+        } else {
+            PageLayout::postInfo(sprintf(
+                dgettext('converisplugin', 'Es wurden keine Projekte für %s gefunden'),
+                $name
+            ));
+            $this->flash->discard();
+            $this->relocate('projects');
+        }
+    }
+
+    public function list_action()
+    {
+        $this->type = $this->flash['type'];
+        $this->context = $this->flash['context'];
+        $this->name = $this->type === 'institute' ?
+            Institute::find($this->flash['context'])->name :
+            User::findByUsername($this->flash['context'])->getFullname();
+        $this->projects = ConverisProject::findMany($this->flash['projects']);
+
+        $this->flash->keep();
 
         PageLayout::setTitle(
-            sprintf(dgettext('converisplugin', 'Liste der Forschungsprojekte für %s'),
-                $this->institute->name));
-
-        $this->projects = ConverisProject::findByOrganisationName($this->institute->name);
+            sprintf(dgettext('converisplugin', 'Liste der Forschungsprojekte für %s'), $this->name));
 
         $views = new ViewsWidget();
+        $views->setTitle(dgettext('converisplugin', 'Projekte'));
         $views->addLink(
-            dgettext('converisplugin', 'Einrichtung wählen'),
-            $this->url_for('projects')
+            dgettext('converisplugin', 'Auswahl'),
+            $this->link_for('projects')
         );
         $views->addLink(
             dgettext('converisplugin', 'Projektliste'),
-            $this->url_for('projects/list', Request::option('institute'))
+            $this->link_for('projects/list')
         )->setActive(true);
         $this->sidebar->addWidget($views);
 
-        if (count($this->projects) > 0) {
-            $actions = new ActionsWidget();
-            $actions->addLink(dgettext('converisplugin', 'Forschungsbericht erstellen'),
-                $this->url_for('export/settings', $this->institute->id, $converisOrganisation->converis_id),
-                Icon::create('literature2'))->asDialog('size=auto');
-            $this->sidebar->addWidget($actions);
-        }
+        $actions = new ActionsWidget();
+        $actions->addLink(dgettext('converisplugin', 'Forschungsbericht erstellen'),
+            $this->link_for('export/settings', $this->type, $this->context),
+            Icon::create('literature2'))->asDialog('size=auto');
+        $this->sidebar->addWidget($actions);
+
     }
 
 }

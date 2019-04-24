@@ -18,8 +18,8 @@ class ConverisPerson extends SimpleORMap
     protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_persons';
-        $config['has_many']['related_projects'] = [
-            'class_name' => 'ConverisProjectPersonRelation',
+        $config['has_many']['cards'] = [
+            'class_name' => 'ConverisCard',
             'foreign_key' => 'converis_id',
             'assoc_foreign_key' => 'person_id'
         ];

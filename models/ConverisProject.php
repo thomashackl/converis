@@ -91,17 +91,46 @@ class ConverisProject extends SimpleORMap
         parent::configure($config);
     }
 
+    /**
+     * Gets all projects associated to a given organisation via cards.
+     *
+     * @param string $name organisation name to check
+     * @return array
+     */
     public static function findByOrganisationName($name)
     {
         $projects = DBManager::get()->fetchAll("SELECT DISTINCT p.*
-            FROM `converis_organisations` o
-                JOIN `converis_card_organisation` co ON (co.`organisation_id` = o.`converis_id`)
-                JOIN `converis_project_card` pc ON (pc.`card_id` = co.`card_id`)
-                JOIN `converis_projects` p ON (p.`project_id` = pc.`project_id`)
+            FROM `converis_projects` p
+                JOIN `converis_project_card` pc ON (pc.`project_id` = p.`converis_id`)
+                JOIN `converis_card_organisation` co ON (co.`card_id` = pc.`card_id`)
+                JOIN `converis_organisations` o ON (o.`converis_id` = co.`organisation_id`)
                 JOIN `converis_project_status` s ON (s.`converis_id` = p.`status`)
             WHERE o.`name_1` = :name
             ORDER BY s.`name_1`, p.`name`",
             ['name' => $name],
+            __CLASS__ . '::buildExisting'
+        );
+
+        return $projects;
+    }
+
+    /**
+     * Gets all projects associated to a given user via cards.
+     *
+     * @param string $username username to check
+     * @return array
+     */
+    public static function findByUsername($username)
+    {
+        $projects = DBManager::get()->fetchAll("SELECT DISTINCT p.*
+            FROM `converis_projects` p
+                JOIN `converis_project_card` pc ON (pc.`project_id` = p.`converis_id`)
+                JOIN `converis_cards` c ON (c.`converis_id` = pc.`card_id`)
+                JOIN `converis_persons` pers ON (pers.`converis_id` = c.`person_id`)
+                JOIN `converis_project_status` s ON (s.`converis_id` = p.`status`)
+            WHERE pers.`username` = :username
+            ORDER BY s.`name_1`, p.`name`",
+            ['username' => $username],
             __CLASS__ . '::buildExisting'
         );
 
