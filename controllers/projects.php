@@ -74,7 +74,6 @@ class ProjectsController extends AuthenticatedController {
      */
     public function get_action()
     {
-        SimpleORMap::expireTableScheme();
         if (Request::option('type') === 'institute') {
             $context = Request::option('institute_id');
             $name = Institute::find($context)->name;
