@@ -42,8 +42,7 @@ class ConverisOrganisation extends SimpleORMap
         $config['db_table'] = 'converis_organisations';
         $config['has_many']['cards'] = [
             'class_name' => 'ConverisCard',
-            'thru_table' => 'converis_card_organisation',
-            'thru_key' => 'organisation_id'
+            'foreign_key' => 'organisation_id'
         ];
         parent::configure($config);
     }
@@ -60,7 +59,7 @@ class ConverisOrganisation extends SimpleORMap
     {
         $organisations = DBManager::get()->fetchAll("SELECT DISTINCT o.*
             FROM `converis_organisations` o
-                JOIN `converis_card_organisation` co ON (co.`organisation_id` = o.`converis_id`)
+                JOIN `converis_cards` c ON (c.`organisation_id` = o.`organisation_id`)
                 JOIN `converis_project_card` pc ON (pc.`card_id` = co.`card_id`)
                 JOIN `converis_projects` p ON (p.`converis_id` = pc.`project_id`)
             WHERE p.`project_id` = :id

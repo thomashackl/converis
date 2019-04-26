@@ -97,8 +97,8 @@ class ConverisProject extends SimpleORMap
         $projects = DBManager::get()->fetchAll("SELECT DISTINCT p.*
             FROM `converis_projects` p
                 JOIN `converis_project_card` pc ON (pc.`project_id` = p.`project_id`)
-                JOIN `converis_card_organisation` co ON (co.`card_id` = pc.`card_id`)
-                JOIN `converis_organisations` o ON (o.`organisation_id` = co.`organisation_id`)
+                JOIN `converis_cards` c ON (c.`card_id` = pc.`card_id`)
+                JOIN `converis_organisations` o ON (o.`organisation_id` = c.`organisation_id`)
                 JOIN `converis_project_status` s ON (s.`status_id` = p.`status`)
             WHERE o.`name_1` = :name
             ORDER BY s.`name_1`, p.`name`",

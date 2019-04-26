@@ -17,6 +17,7 @@
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Mpdf\Mpdf;
 
@@ -27,16 +28,17 @@ class ExportController extends AuthenticatedController
      * Actions and settings taking place before every page call.
      */
     public function before_filter(&$action, &$args) {
-        if ($GLOBALS['perm']->have_perm('root') || in_array($GLOBALS['user']->username, ['hackl10', 'kuchle03', 'zukows02'])) {
-            $this->plugin = $this->dispatcher->plugin;
-            $this->flash = Trails_Flash::instance();
-            $this->set_layout(null);
-        } else {
+        if (!$GLOBALS['perm']->have_perm('root') &&
+                !in_array($GLOBALS['user']->username, ['hackl10', 'kuchle03', 'zukows02'])) {
             throw new AccessDeniedException();
         }
+
+        $this->plugin = $this->dispatcher->plugin;
+        $this->flash = Trails_Flash::instance();
+        $this->set_layout(null);
     }
 
-    public function settings_action($studipInstituteId, $converisOrganisationId)
+    public function settings_action($type, $target)
     {
         if (!Request::isXhr()) {
             $this->set_layout($GLOBALS['template_factory']->open('layouts/base'));
@@ -44,10 +46,9 @@ class ExportController extends AuthenticatedController
 
         PageLayout::setTitle(dgettext('converisplugin', 'Forschungsbericht erstellen'));
 
-        $this->organisationId = $converisOrganisationId;
-        $this->instituteId = $studipInstituteId;
+        $this->target = $target;
 
-        $this->templates = Config::get()->CONVERIS_REPORT_TEMPLATES;
+        $this->templates = Config::get()->CONVERIS_REPORT_TEMPLATES[$type];
 
         $currentMonth = date('m');
         if ($currentMonth < 10) {
@@ -66,9 +67,9 @@ class ExportController extends AuthenticatedController
     {
         $response = $this->relay('export/' . Request::option('template'),
             Request::get('start_date'), Request::get('end_date'),
-            Request::option('institute_id'), Request::int('organisation_id'));
-        $this->body = $response->body;
-        $this->render_text($this->body);
+            Request::get('target'));
+
+        $this->render_text($response->body);
     }
 
     /**
@@ -77,9 +78,8 @@ class ExportController extends AuthenticatedController
      * @param string $start start of export time frame
      * @param string $end end of export time frame
      * @param string $studipInstituteId ID of chosen Stud.IP institute
-     * @param int $converisOrganisationId ID of chosen Converis organisation
      */
-    public function pdf_fim_action($start, $end, $studipInstituteId, $converisOrganisationId)
+    public function pdf_fim_action($start, $end, $studipInstituteId)
     {
         $this->start = $start;
         $this->end = $end;
@@ -139,69 +139,66 @@ class ExportController extends AuthenticatedController
         $mpdf->Output('Drittmittelprojekte-' . $this->institute->name . '-' . $this->start . '-' . $this->end . '.pdf', 'D');
     }
 
-    public function excel_action($institute_id)
+    /**
+     * Generates a Excel format export of the performance overview.
+     *
+     * @param string $start start of export time frame
+     * @param string $end end of export time frame
+     * @param string $username username of the chosen Stud.IP user
+     */
+    public function xls_leistungsbezuege_action($start, $end, $username)
     {
-        $institute = Institute::find($institute_id);
+        $this->start = $start;
+        $this->end = $end;
 
-        $free = ConverisProject::findByInstitute_id($institute->id);
+        $startDate = strtotime($this->start);
+        $endDate = strtotime($this->end);
 
-        $third_party = ConverisProjectAggThirdParty::findByInstitute_id($institute->id);
+        $person = ConverisPerson::findOneByUsername($username);
 
-        $projects = array_merge($free, $third_party);
-        usort($projects, function($a, $b) {
-            return strnatcasecmp($a['kurzbezeichnung'], $b['kurzbezeichnung']);
-        });
+        $fullname = implode(' ', [$person->academic_title, $person->first_name, $person->last_name]);
 
-        // Process data -> create Excel file.
-        if (count($projects) > 0) {
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getProperties()
+            ->setCreator($GLOBALS['user']->getFullname())
+            ->setLastModifiedBy($GLOBALS['user']->getFullname())
+            ->setTitle('Leistungsbezüge ' . $fullname)
+            ->setSubject('Leistungsbezüge ' . $fullname);
+        $spreadsheet->removeSheetByIndex(0);
 
-            $spreadsheet = new Spreadsheet();
-            $spreadsheet->getProperties()
-                ->setCreator($GLOBALS['user']->getFullname())
-                ->setLastModifiedBy($GLOBALS['user']->getFullname())
-                ->setTitle('Projekte ' . $institute->name)
-                ->setSubject('Projekte ' . $institute->name);
-            $sheet = $spreadsheet->getActiveSheet();
+        foreach ($person->cards as $card) {
 
-            // Write header lines.
-            $sheet->fromArray(
-                array_filter(
-                    array_keys(
-                        $projects[0]->getTableMetadata()['fields']
-                    ),
-                    function ($one) {
-                        return !in_array($one, ['id', 'mkdate', 'chdate']);
-                    }
-                ),
-                '', 'A1');
+            // Create sheet for third party projects.
+            $sheet = $spreadsheet->createSheet();
+            $sheet->setTitle('Drittmittelprojekte');
+            $sheet->mergeCells('A1:G1');
+            $sheet->getStyle('A1')
+                ->getFill()
+                ->setFillType(Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('D9D9D900');
+            $sheet->setCellValue('A1', $fullname . '(' . $card->organisation->name_1 . ')');
 
-            // Write data to cells.
-            $sheet->fromArray(array_map(function ($one) {
-                return array_filter(
-                    $one->toArray(),
-                    function ($col) {
-                        return !in_array($col, ['id', 'mkdate', 'chdate']);
-                    },
-                    ARRAY_FILTER_USE_KEY
-                );
-            }, $projects), '', 'A2');
+            $data = [];
+            $projects = $card->related_projects;
 
-            $writer = new Xlsx($spreadsheet);
-            $filename = $GLOBALS['TMP_PATH'] . '/projects-' . mktime() . '.xlsx';
-
-            $writer->save($filename);
-
-            $this->relocate(
-                FileManager::getDownloadURLForTemporaryFile(
-                    $filename, 'Projekte ' . $institute->name . '.xlsx'));
-
-            // No data found, redirect to main page and show corresponding message.
-        } else {
-            PageLayout::postInfo(sprintf(
-                'Es wurden keine Forschungsprojekte an der gewählten Einrichtung "%s" gefunden.',
-                $institute->name));
-            $this->relocate('projects');
+            if ($projects !== null && count($projects) > 0) {
+                foreach ($projects as $p) {
+                    $data[] = 0;
+                }
+            }
         }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'leistungsbezuege-' . strtolower($person->last_name) . '.xlsx';
+
+        $this->set_content_type('vnd.openxmlformats-officedocument. spreadsheetml.sheet');
+        $this->response->add_header('Content-Disposition', 'attachment;' . encode_header_parameter('filename', $filename));
+        $this->response->add_header('Cache-Control', 'cache, must-revalidate');
+        $this->response->add_header('Pragma', 'public');
+
+        $writer->save('php://output');
+
+        $this->render_nothing();
     }
 
 }

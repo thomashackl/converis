@@ -142,7 +142,6 @@ class Init extends Migration {
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_organisations`
         (
             `organisation_id` INT NOT NULL,
-            `converis_organisations_id` INT NOT NULL,
             `name_1` VARCHAR(255) NOT NULL,
             `name_2` VARCHAR(255) NULL,
             `short_description` VARCHAR(1024) NULL,
@@ -194,6 +193,7 @@ class Init extends Migration {
         (
             `card_id` INT NOT NULL,
             `person_id` INT NOT NULL REFERENCES `converis_persons`.`person_id`,
+            `organisation_id` INT NULL REFERENCES `converis_organisations`.`organisation_id`,
             `external` TINYINT(1) NOT NULL DEFAULT 0,
             `address` VARCHAR(255) NULL,
             `email` VARCHAR(255) NULL,
@@ -202,7 +202,7 @@ class Init extends Migration {
             `mobile` VARCHAR(255) NULL,
             `phone` VARCHAR(255) NULL,
             `url` VARCHAR(255) NULL,
-            `organisation` VARCHAR(255) NULL,
+            `organisation_text` VARCHAR(255) NULL,
             `payroll_lookup` VARCHAR(1024) NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
@@ -220,16 +220,6 @@ class Init extends Migration {
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
             PRIMARY KEY (`source_id`)
-        ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
-
-        // Relation card - organisation
-        DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_card_organisation`
-        (
-            `card_id` INT NOT NULL REFERENCES `converis_cards`.`card_id`,
-            `organisation_id` INT NOT NULL REFERENCES `converis_organisations`.`organisation_id`,
-            `mkdate` DATETIME(3) NOT NULL,
-            `chdate` DATETIME(3) NOT NULL,
-            PRIMARY KEY (`card_id`, `organisation_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
         // Relation area - project

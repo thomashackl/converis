@@ -278,6 +278,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 "SELECT DISTINCT
                     c.id AS card_id,
                     p.id AS person_id,
+                    co.iot_organisation AS organisation_id,
                     CASE
                         WHEN c1.value = 'Internal' THEN 0
                         WHEN c1.value = 'External' THEN 1
@@ -290,13 +291,14 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     c.mobile,
                     c.phone,
                     c.url,
-                    c.organisation,
+                    c.organisation AS organisation_text,
                     c.payroll_lookup,
                     c.c_created_on AS mkdate,
                     c.c_updated_on AS chdate
                 FROM iot_card c
                     JOIN rel_pers_has_card pc ON (pc.iot_card = c.id)
                     JOIN iot_person p ON (p.id = pc.iot_person)
+                    LEFT JOIN rel_card_has_orga co ON (co.iot_card = c.id)
                     LEFT JOIN choicegroupvalue c1 ON (c1.id = c.external)
                     LEFT JOIN choicegroupvalue c2 ON (c2.id = p.academic_title)
                     LEFT JOIN choicegroupvalue c3 ON (c3.id = c.function)
@@ -411,23 +413,6 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 'ConverisRole',
                 'role_id',
                 false
-            );
-
-            // Connect cards and organisations
-            $this->importRawConverisData(
-                "SELECT DISTINCT
-                    co.iot_card AS card_id,
-                    co.iot_organisation AS organisation_id,
-                    co.c_created_on AS mkdate,
-                    co.c_updated_on AS chdate
-                FROM rel_card_has_orga co
-                    JOIN iot_card c ON (c.id = co.iot_card)
-                    JOIN iot_organisation o ON (o.id = co.iot_organisation)
-                WHERE co.c_created_on > :tstamp OR co.c_updated_on > :tstamp
-                    AND c.status_process < 5
-                    AND o.status_process < 4
-                ORDER BY card_id, organisation_id",
-                'converis_card_organisation'
             );
 
             // Connect projects and cards

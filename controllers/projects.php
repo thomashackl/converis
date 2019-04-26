@@ -23,6 +23,8 @@ class ProjectsController extends AuthenticatedController {
         $this->plugin = $this->dispatcher->plugin;
         $this->flash = Trails_Flash::instance();
 
+        SimpleORMap::expireTableScheme();
+
         if ($GLOBALS['perm']->have_perm('root') || ConverisAdmin::findByUsername($GLOBALS['user']->username)) {
 
             if (Request::isXhr()) {
