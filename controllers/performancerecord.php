@@ -22,6 +22,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PerformanceRecordController extends AuthenticatedController
@@ -44,14 +46,7 @@ class PerformanceRecordController extends AuthenticatedController
         $this->set_layout(null);
     }
 
-    /**
-     * Generates a Excel format export of the performance overview.
-     *
-     * @param string $start start of export time frame
-     * @param string $end end of export time frame
-     * @param string $username username of the chosen Stud.IP user
-     */
-    public function xls_action($start, $end, $username)
+    public function xls_action($start, $end, $username, $format = 'xls')
     {
         $this->start = new DateTime($start);
         $this->end = new DateTime($end);
@@ -165,6 +160,10 @@ class PerformanceRecordController extends AuthenticatedController
              * Create sheet for third party projects.
              */
             $sheet = $spreadsheet->createSheet();
+
+            $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+            $sheet->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_A4);
+
             $sheet->getColumnDimension('A')->setWidth(43);
             $sheet->getColumnDimension('B')->setWidth(54.5);
             $sheet->getColumnDimension('C')->setWidth(20);
@@ -263,7 +262,8 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getStyle('A1')
                 ->getFont()
                 ->setBold(true);
-            $sheet->setCellValue('A1', $person->getFullname() . '(' . $card->organisation->name_1 . ')');
+            $sheet->setCellValue('A1',
+                $person->getFullname() . '(' . $card->organisation->name_1 . ')');
 
             $row = 3;
 
@@ -320,19 +320,42 @@ class PerformanceRecordController extends AuthenticatedController
             $counter++;
         }
 
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'leistungsbezuege-' . strtolower($person->last_name) . '.xlsx';
+        $spreadsheet->setActiveSheetIndex(0);
 
-        $this->set_content_type('vnd.openxmlformats-officedocument. spreadsheetml.sheet');
+        $filename = 'leistungsbezuege-' . strtolower($person->last_name);
+
+        if ($format === 'xls') {
+            $writer = new Xlsx($spreadsheet);
+            $filename .= '.xlsx';
+            $this->set_content_type('vnd.openxmlformats-officedocument. spreadsheetml.sheet');
+        } else if ($format === 'pdf') {
+            $writer = new Mpdf($spreadsheet);
+            $filename .= '.pdf';
+            $this->set_content_type('application/pdf');
+            $writer->writeAllSheets();
+        }
+
         $this->response->add_header('Content-Disposition',
             'attachment;' . encode_header_parameter('filename', $filename));
         $this->response->add_header('Cache-Control', 'cache, must-revalidate');
         $this->response->add_header('Pragma', 'public');
+
         $this->response->add_header('X-Dialog-Close', 1);
 
         $writer->save('php://output');
-
         $this->render_nothing();
+    }
+
+    /**
+     * Generates a PDF format export of the performance overview.
+     *
+     * @param string $start start of export time frame
+     * @param string $end end of export time frame
+     * @param string $username username of the chosen Stud.IP user
+     */
+    public function pdf_action($start, $end, $username)
+    {
+        $this->relocate('performancerecord/xls', $start, $end, $username, 'pdf');
     }
 
     private function getProjects($card)
@@ -416,14 +439,16 @@ class PerformanceRecordController extends AuthenticatedController
              */
             foreach (['third_party_submitted', 'third_party_1', 'third_party_2', 'third_party_declined'] as $section) {
                 usort($projects[$section], function($a, $b) {
-                    if ($a->project->related_sources_of_funds != null && count($a->project->related_sources_of_funds) > 0) {
+                    if ($a->project->related_sources_of_funds != null &&
+                            count($a->project->related_sources_of_funds) > 0) {
                         $sort1 = $a->project->related_sources_of_funds->first()->source_of_funds->name;
                     } else {
                         $sort1 = '';
                     }
                     $sort1 .= $a->project->name;
 
-                    if ($b->project->related_sources_of_funds != null && count($b->project->related_sources_of_funds) > 0) {
+                    if ($b->project->related_sources_of_funds != null &&
+                            count($b->project->related_sources_of_funds) > 0) {
                         $sort2 = $b->project->related_sources_of_funds->first()->source_of_funds->name;
                     } else {
                         $sort2 = '';
