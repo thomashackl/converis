@@ -63,7 +63,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     FROM iot_project_general p
                         JOIN iothasstatusprocess h ON (h.status_sequence = p.status_process)
                         JOIN choicegroupvalue c ON (c.id = h.status_process)
-                    WHERE h.infoobjecttype = 36
+                    WHERE h.infoobjecttype = 172
                     ORDER BY name_1",
                 'ConverisProjectStatus',
                 'status_id',
@@ -73,16 +73,46 @@ class ConverisProjectsSyncCronjob extends CronJob {
             // Get applications.
             $this->importConverisData(
                 "SELECT DISTINCT
-                    id AS application_id,
-                    start_date,
-                    end_date,
-                    deadline,
-                    funding_amount,
-                    funding_amount_cur,
-                    commentary_financial_data,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM iot_application
+                    a.id AS application_id,
+                    a.call_number,
+                    a.start_date,
+                    a.end_date,
+                    a.duration_in_months,
+                    a.deadline,
+                    a.confirmation_of_receipt_date,
+                    a.participation_role AS participation_role_id,
+                    a.total_project_expenses,
+                    c1.value AS total_project_expenses_cur,
+                    a.expenses_university_of_passau AS expenses_upa,
+                    c2.value AS expenses_upa_cur,
+                    a.funding_amount,
+                    c3.value AS funding_amount_cur,
+                    a.funding_quota,
+                    a.project_flat_charge,
+                    a.own_contribution,
+                    c4.value AS own_contribution_cur,
+                    a.research_pool,
+                    c5.value AS research_pool_cur,
+                    a.funding_project_leader,
+                    c6.value  AS funding_project_leader_cur,
+                    a.funding_third_party,
+                    c7.value AS funding_third_party_cur,
+                    a.commentary_financial_data,
+                    CASE
+                        WHEN c8.value = 'Ja' THEN 1
+                        ELSE 0
+                    END AS university_is_applicant,
+                    a.c_created_on AS mkdate,
+                    a.c_updated_on AS chdate
+                FROM iot_application a
+                    LEFT JOIN choicegroupvalue c1 ON (c1.id = a.total_project_expenses_cu)
+                    LEFT JOIN choicegroupvalue c2 ON (c2.id = a.expenses_university_cur)
+                    LEFT JOIN choicegroupvalue c3 ON (c3.id = a.funding_amount_cur)
+                    LEFT JOIN choicegroupvalue c4 ON (c4.id = a.own_contribution_cur)
+                    LEFT JOIN choicegroupvalue c5 ON (c5.id = a.research_pool_cur)
+                    LEFT JOIN choicegroupvalue c6 ON (c6.id = a.funding_project_leader_cu)
+                    LEFT JOIN choicegroupvalue c7 ON (c7.id = a.funding_third_party_cur)
+                    LEFT JOIN choicegroupvalue c8 ON (c8.id = a.university_is_applicant)
                 WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
                 ORDER BY application_id",
                 'ConverisApplication',
@@ -111,7 +141,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     p.url,
                     p.start_date,
                     p.end_date,
-                    s.status_process AS status,
+                    s.status_process AS status_id,
                     p.ispublic AS is_public,
                     a.iot_application AS application_id,
                     p.c_created_on AS mkdate,
@@ -164,11 +194,12 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 "SELECT DISTINCT
                     p.id AS project_id,
                     project_number,
-                    project_type,
+                    project_type AS type_id,
                     CASE
                         WHEN p.doctoral_program THEN 1
                         ELSE 0
                     END AS doctoral_program,
+                    duration_in_months,
                     extension_until,
                     stepped_into_running_project,
                     date_exit_project,
@@ -316,6 +347,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     a.name AS name_1,
                     a.name_en AS name_2,
                     a.c_short_description AS short_description,
+                    c.value AS area_type,
                     a.c_created_on AS mkdate,
                     a.c_updated_on AS chdate
                 FROM iot_area a
@@ -409,6 +441,13 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     c.value_2 AS name_2
                 FROM choicegroupvalue c
                     JOIN rel_orga_has_proj_frin oe ON (oe.role = c.id)
+                UNION
+                SELECT DISTINCT
+                    c.id AS role_id,
+                    c.value_1 AS name_1,
+                    c.value_2 AS name_2
+                FROM choicegroupvalue c
+                    JOIN iot_application a ON (a.participation_role = c.id)
                 ORDER BY role_id",
                 'ConverisRole',
                 'role_id',
@@ -421,7 +460,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     iot_project AS project_id,
                     iot_card AS card_id,
                     'internal' AS type,
-                    role,
+                    role AS role_id,
                     CASE
                         WHEN junior_scientist THEN 1
                         ELSE 0
@@ -439,10 +478,10 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     iot_project AS project_id,
                     iot_card AS person_id,
                     'external' AS type,
-                    NULL::int AS role,
+                    NULL::int AS role_id,
                     0 AS junior_scientist,
-                    NULL::numeric AS contributed_share,
-                    NULL::numeric AS percentage_of_funding,
+                    NULL AS contributed_share,
+                    NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
                     c_created_on AS mkdate,
@@ -454,10 +493,10 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     iot_project_general AS project_id,
                     iot_card AS card_id,
                     'internal' AS type,
-                    role,
+                    role AS role_id,
                     0 AS junior_scientist,
-                    NULL::numeric AS contributed_share,
-                    NULL::numeric AS percentage_of_funding,
+                    NULL AS contributed_share,
+                    NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
                     c_created_on AS mkdate,
@@ -469,10 +508,10 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     iot_project_general AS project_id,
                     iot_card AS card_id,
                     'external' AS type,
-                    NULL::int AS role,
+                    NULL::int AS role_id,
                     0 AS junior_scientist,
-                    NULL::numeric AS contributed_share,
-                    NULL::numeric AS percentage_of_funding,
+                    NULL AS contributed_share,
+                    NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
                     c_created_on AS mkdate,

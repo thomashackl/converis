@@ -10,10 +10,11 @@
  * @author      Thomas Hackl <thomas.hackl@uni-passau.de>
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
+ *
  * @property string card_id database column
  * @property string id alias column for card_id
- * @property string converis_id database column
  * @property string person_id database column
+ * @property string organisation_id database column
  * @property string external database column
  * @property string address database column
  * @property string email database column
@@ -22,12 +23,13 @@
  * @property string mobile database column
  * @property string phone database column
  * @property string url database column
- * @property ConverisOrganisation organisation belongs_to ConverisOrganisation
+ * @property string organisation_text database column
  * @property string payroll_lookup database column
  * @property string mkdate database column
  * @property string chdate database column
  * @property SimpleORMapCollection related_projects has_many ConverisProjectCardRelation
  * @property ConverisPerson person belongs_to ConverisPerson
+ * @property ConverisOrganisation organisation belongs_to ConverisOrganisation
  */
 
 class ConverisCard extends SimpleORMap
@@ -38,11 +40,13 @@ class ConverisCard extends SimpleORMap
         $config['db_table'] = 'converis_cards';
         $config['belongs_to']['person'] = [
             'class_name' => 'ConverisPerson',
-            'foreign_key' => 'person_id'
+            'foreign_key' => 'person_id',
+            'assoc_foreign_key' => 'person_id'
         ];
         $config['belongs_to']['organisation'] = [
             'class_name' => 'ConverisOrganisation',
-            'foreign_key' => 'organisation_id'
+            'foreign_key' => 'organisation_id',
+            'assoc_foreign_key' => 'organisation_id'
         ];
         $config['has_many']['related_projects'] = [
             'class_name' => 'ConverisProjectCardRelation',

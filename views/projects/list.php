@@ -44,7 +44,7 @@
                                 $rel->card->person->last_name
                             ])) ?>
                             <?php if ($rel->role != 0) : ?>
-                                (<?= htmlReady($rel->role_object->name_1) ?>)
+                                (<?= htmlReady($rel->role->name_1) ?>)
                             <?php endif ?>
                         <?php else : ?>
                             <ul>
@@ -56,7 +56,7 @@
                                             $rel->card->person->last_name
                                         ])) ?>
                                         <?php if ($rel->role != 0) : ?>
-                                            (<?= htmlReady($rel->role_object->name_1) ?>)
+                                            (<?= htmlReady($rel->role->name_1) ?>)
                                         <?php endif ?>
                                     </li>
                                 <?php endforeach ?>
@@ -66,7 +66,7 @@
                         -
                     <?php endif ?>
                 </td>
-                <td><?= htmlReady($project->project_status->name_1) ?></td>
+                <td><?= htmlReady($project->status->name_1) ?></td>
             </tr>
         <?php endforeach ?>
     </tbody>

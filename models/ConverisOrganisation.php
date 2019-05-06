@@ -13,8 +13,6 @@
  *
  * @property string organisation_id database column
  * @property string id alias column for organisation_id
- * @property string converis_id database column
- * @property string converis_organisations_id database column
  * @property string name_1 database column
  * @property string name_2 database column
  * @property string short_description database column

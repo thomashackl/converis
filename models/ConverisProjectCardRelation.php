@@ -15,7 +15,7 @@
  * @property string project_id database column
  * @property string card_id database column
  * @property string type database column
- * @property string role database column
+ * @property string role_id database column
  * @property string start_date database column
  * @property string end_date database column
  * @property string junior_scientist database column
@@ -26,7 +26,7 @@
  * @property string id computed column read/write
  * @property ConverisProject project belongs_to ConverisProject
  * @property ConverisCard card belongs_to ConverisCard
- * @property ConverisRole role_object has_one ConverisRole
+ * @property ConverisRole role has_one ConverisRole
  */
 
 class ConverisProjectCardRelation extends SimpleORMap
@@ -43,11 +43,17 @@ class ConverisProjectCardRelation extends SimpleORMap
             'class_name' => 'ConverisCard',
             'foreign_key' => 'card_id'
         ];
-        $config['has_one']['role_object'] = [
+        $config['has_one']['role'] = [
             'class_name' => 'ConverisRole',
-            'foreign_key' => 'role',
+            'foreign_key' => 'role_id',
             'assoc_foreign_key' => 'role_id'
         ];
+        $config['additional_fields']['person_name']['get'] = function ($pcRelation) {
+            return $pcRelation->person->getFullname();
+        };
+        $config['additional_fields']['project_name']['get'] = function ($pcRelation) {
+            return $pcRelation->project->name;
+        };
         parent::configure($config);
     }
 

@@ -159,7 +159,7 @@
                         <?php endif ?>
                     </td>
                     <td>
-                        <?= htmlReady($p->project_status->name_1) ?>
+                        <?= htmlReady($p->status->name_1) ?>
                         <br>
                         <?php if (strtotime($p->start_date) > 0) : ?>
                             <?= htmlReady(date('d.m.Y', strtotime($p->start_date))) ?>

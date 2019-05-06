@@ -13,13 +13,31 @@
  *
  * @property string application_id database column
  * @property string id alias column for application_id
- * @property string converis_id database column
+ * @property string call_number database column
  * @property string start_date database column
  * @property string end_date database column
+ * @property string duration_in_months database column
  * @property string deadline database column
+ * @property string confirmation_of_receipt_date database column
+ * @property string participation_role_id database column
+ * @property string total_project_expenses database column
+ * @property string total_project_expenses_cur database column
+ * @property string expenses_upa database column
+ * @property string expenses_upa_cur database column
  * @property string funding_amount database column
  * @property string funding_amount_cur database column
+ * @property string funding_quota database column
+ * @property string project_flat_charge database column
+ * @property string own_contribution database column
+ * @property string own_contribution_cur database column
+ * @property string research_pool database column
+ * @property string research_pool_cur database column
+ * @property string funding_project_leader database column
+ * @property string funding_project_leader_cur database column
+ * @property string funding_third_party database column
+ * @property string funding_third_party_cur database column
  * @property string commentary_financial_data database column
+ * @property string university_is_applicant database column
  * @property string mkdate database column
  * @property string chdate database column
  */
@@ -30,6 +48,11 @@ class ConverisApplication extends SimpleORMap
     protected static function configure($config = [])
     {
         $config['db_table'] = 'converis_applications';
+        $config['has_one']['participation_role'] = [
+            'class_name' => 'ConverisRole',
+            'foreign_key' => 'participation_role_id',
+            'assoc_foreign_key' => 'role_id'
+        ];
         parent::configure($config);
     }
 

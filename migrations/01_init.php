@@ -30,12 +30,31 @@ class Init extends Migration {
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_applications`
         (
             `application_id` INT NOT NULL,
+            `call_number` VARCHAR(100) NULL,
             `start_date` DATE NULL,
             `end_date` DATE NULL,
+            `duration_in_months` TINYINT UNSIGNED NULL,
             `deadline` DATE NULL,
+            `confirmation_of_receipt_date` DATE NULL,
+            `participation_role_id` INT NULL REFERENCES `converis_roles`.`role_id`,
+            `total_project_expenses` FLOAT(11,2) NULL,
+            `total_project_expenses_cur` VARCHAR(100) NULL,
+            `expenses_upa` FLOAT(11,2) NULL,
+            `expenses_upa_cur` VARCHAR(100) NULL,
             `funding_amount` FLOAT(11,2) NULL,
             `funding_amount_cur` VARCHAR(100) NULL,
+            `funding_quota` VARCHAR(255) NULL,
+            `project_flat_charge` VARCHAR(255) NULL,
+            `own_contribution` FLOAT(11,2) NULL,
+            `own_contribution_cur` VARCHAR(100) NULL,
+            `research_pool` FLOAT(11,2) NULL,
+            `research_pool_cur` VARCHAR(100) NULL,
+            `funding_project_leader` FLOAT(11,2) NULL,
+            `funding_project_leader_cur` VARCHAR(100) NULL,
+            `funding_third_party` FLOAT(11,2) NULL,
+            `funding_third_party_cur` VARCHAR(100) NULL,
             `commentary_financial_data` TEXT NULL,
+            `university_is_applicant` TINYINT(1) NOT NULL DEFAULT 1,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
             PRIMARY KEY (`application_id`)
@@ -63,7 +82,7 @@ class Init extends Migration {
             `url` VARCHAR(500) NULL,
             `start_date` DATE NULL,
             `end_date` DATE NULL,
-            `status` INT NOT NULL DEFAULT 0,
+            `status_id` INT NOT NULL DEFAULT 0,
             `is_public` INT NULL DEFAULT 0,
             `application_id` INT NULL REFERENCES `converis_appliactions`.`application_id`,
             `mkdate` DATETIME(3) NOT NULL,
@@ -76,8 +95,9 @@ class Init extends Migration {
         (
             `project_id` INT NOT NULL,
             `project_number` VARCHAR(100) NULL,
-            `project_type` INT NULL REFERENCES `converis_project_types`.`type_id`,
+            `type_id` INT NULL REFERENCES `converis_project_types`.`type_id`,
             `doctoral_program` TINYINT(1) NOT NULL DEFAULT 0,
+            `duration_in_months` TINYINT UNSIGNED NULL,
             `extension_until` DATETIME NULL,
             `stepped_into_running_project` DATETIME NULL,
             `date_exit_project` DATETIME NULL,
@@ -238,12 +258,12 @@ class Init extends Migration {
             `project_id` INT NOT NULL REFERENCES `converis_projects`.`project_id`,
             `card_id` INT NOT NULL REFERENCES `converis_cards`.`card_id`,
             `type` ENUM ('internal', 'external'),
-            `role` INT NULL REFERENCES `converis_roles`.`role_id`,
+            `role_id` INT NULL REFERENCES `converis_roles`.`role_id`,
             `start_date` DATE NULL,
             `end_date` DATE NULL,
             `junior_scientist` TINYINT(1) NOT NULL DEFAULT 0,
-            `contributed_share` FLOAT(5,2) NULL,
-            `percentage_of_funding` FLOAT(5,2) NULL,
+            `contributed_share` VARCHAR(255) NULL,
+            `percentage_of_funding` VARCHAR(255) NULL,
             `mkdate` DATETIME(3) NOT NULL,
             `chdate` DATETIME(3) NOT NULL,
             PRIMARY KEY (`project_id`, `card_id`)
@@ -304,19 +324,23 @@ class Init extends Migration {
                     'institute' => [
                         'pdf_fim' => [
                             'name' => 'Forschungsbericht FIM',
-                            'action' => 'pdf_fim'
+                            'type' => 'institute',
+                            'controller' => 'fim',
+                            'action' => 'pdf'
                         ]
                     ],
                     'user' => [
                         'xls_leistungsbezuege' => [
                             'name' => 'Leistungsbezüge (Excel)',
                             'type' => 'user',
-                            'action' => 'xls_leistungsbezuege'
+                            'controller' => 'performancerecord',
+                            'action' => 'xls'
                         ],
                         'pdf_leistungsbezuege' => [
                             'name' => 'Leistungsbezüge (PDF)',
                             'type' => 'user',
-                            'action' => 'pdf_leistungsbezuege'
+                            'controller' => 'performancerecord',
+                            'action' => 'pdf'
                         ]
                     ]
                 ]),

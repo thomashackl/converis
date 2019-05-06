@@ -33,7 +33,9 @@
             </select>
         </section>
     </fieldset>
+    <input type="hidden" name="type" value="<?= $type ?>">
     <input type="hidden" name="target" value="<?= $target ?>">
+    <?= CSRFProtection::tokenTag() ?>
     <footer data-dialog-button>
         <?= Studip\Button::createAccept(dgettext('converisplugin', 'Bericht erzeugen'), 'submit') ?>
         <?= Studip\LinkButton::createCancel(_('Abbrechen'), $controller->link_for('project/list', $organisationId)) ?>

@@ -11,11 +11,11 @@
  * @author      Thomas Hackl <thomas.hackl@uni-passau.de>
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
+ *
  * @property string project_id database column
  * @property string id alias column for project_id
- * @property string converis_id database column
  * @property string project_number database column
- * @property string project_type database column
+ * @property string type_id database column
  * @property string doctoral_program database column
  * @property string extension_until database column
  * @property string stepped_into_running_project database column
@@ -63,7 +63,7 @@ class ConverisProjectThirdPartyData extends SimpleORMap
         ];
         $config['has_one']['type'] = [
             'class_name' => 'ConverisProjectType',
-            'foreign_key' => 'project_type',
+            'foreign_key' => 'type_id',
             'assoc_foreign_key' => 'type_id'
         ];
         parent::configure($config);
