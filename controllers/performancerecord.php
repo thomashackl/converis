@@ -180,7 +180,8 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getStyle('A1')
                 ->getFont()
                 ->setBold(true);
-            $sheet->setCellValue('A1', $person->getFullname() . ', ' . $card->organisation->name_1);
+            $sheet->setCellValue('A1', $person->getFullname() .
+                ' (' . $card->organisation->name_1 . ')');
 
             $row = 3;
 
@@ -263,7 +264,7 @@ class PerformanceRecordController extends AuthenticatedController
                 ->getFont()
                 ->setBold(true);
             $sheet->setCellValue('A1',
-                $person->getFullname() . ', ' . $card->organisation->name_1);
+                $person->getFullname() . ' (' . $card->organisation->name_1 . ')');
 
             $row = 3;
 
