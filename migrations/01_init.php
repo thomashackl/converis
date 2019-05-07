@@ -269,6 +269,20 @@ class Init extends Migration {
             PRIMARY KEY (`project_id`, `card_id`)
         ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
 
+        // Relation project - organisation
+        DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_project_organisation`
+        (
+            `project_id` INT NOT NULL REFERENCES `converis_projects`.`project_id`,
+            `organisation_id` INT NOT NULL REFERENCES `converis_organisations`.`organisation_id`,
+            `type` ENUM ('internal', 'external'),
+            `role_id` INT NULL REFERENCES `converis_roles`.`role_id`,
+            `start_date` DATE NULL,
+            `end_date` DATE NULL,
+            `mkdate` DATETIME(3) NOT NULL,
+            `chdate` DATETIME(3) NOT NULL,
+            PRIMARY KEY (`project_id`, `organisation_id`)
+        ) ENGINE InnoDB ROW_FORMAT=DYNAMIC");
+
         // Relation project - source of funds
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_project_source_of_funds`
         (

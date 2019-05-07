@@ -180,7 +180,7 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getStyle('A1')
                 ->getFont()
                 ->setBold(true);
-            $sheet->setCellValue('A1', $person->getFullname() . '(' . $card->organisation->name_1 . ')');
+            $sheet->setCellValue('A1', $person->getFullname() . ', ' . $card->organisation->name_1);
 
             $row = 3;
 
@@ -263,7 +263,7 @@ class PerformanceRecordController extends AuthenticatedController
                 ->getFont()
                 ->setBold(true);
             $sheet->setCellValue('A1',
-                $person->getFullname() . '(' . $card->organisation->name_1 . ')');
+                $person->getFullname() . ', ' . $card->organisation->name_1);
 
             $row = 3;
 
@@ -485,13 +485,37 @@ class PerformanceRecordController extends AuthenticatedController
                 $useApplication = false;
             }
 
-            if ($project->related_sources_of_funds != null && count($project->related_sources_of_funds) > 0) {
-                $sofNames = implode(', ',
-                    $project->related_sources_of_funds->map(function ($one) {
-                        return $one->source_of_funds->name;
-                    }));
+            if (in_array($project->third_party_data->type->name_1, ['Auftragsforschung', 'Kooperation', 'Lizenz'])) {
+
+                $external = $project->related_organisations->filter(function ($o) {
+                    return $o->type === 'external';
+                });
+                if (count($external) > 0) {
+                    $names = $external->map(function ($one) {
+                        return $one->organisation->name_1;
+                    });
+
+                    usort($names, 'strnatcasecmp');
+
+                    $sofNames = implode(', ', $names);
+                } else {
+                    $sofNames = 'k. A.';
+                }
+
             } else {
-                $sofNames = 'k. A.';
+
+                if ($project->related_sources_of_funds != null && count($project->related_sources_of_funds) > 0) {
+                    $names = $project->related_sources_of_funds->map(function ($one) {
+                        return $one->source_of_funds->name;
+                    });
+
+                    usort($names, 'strnatcasecmp');
+
+                    $sofNames = implode(', ', $names);
+                } else {
+                    $sofNames = 'k. A.';
+                }
+
             }
 
             $nameDesc = $project->name;
@@ -577,8 +601,12 @@ class PerformanceRecordController extends AuthenticatedController
                         ]) . "\n");
                 $cost->createText('Förderquote: ' .
                     ($useApplication ?
-                        ($project->application->funding_quota ?: 'k. A.') :
-                        ($project->third_party_data->funding_quota ?: 'k. A.')
+                        ($project->application->funding_quota ?
+                            $project->application->funding_quota . ' %' :
+                            'k. A.') :
+                        ($project->third_party_data->funding_quota ?
+                            $project->third_party_data->funding_quota . ' %' :
+                            'k. A.')
                     ) . "\n");
                 $cost->createText('Eigenanteil Projektteam: ' .
                     implode(' ',
@@ -623,11 +651,31 @@ class PerformanceRecordController extends AuthenticatedController
                     $cost->createText("\n\n");
                     $costpart = $cost->createTextRun(sprintf("Anteil %s:\n", $relation->card->person->getFullname()));
                     $costpart->getFont()->setUnderline(true);
-                    $cost->createText('an Fördersumme: ' . ($relation->percentage_of_funding ?: 'k. A.' . "\n"));
-                    $cost->createText('an Eigenanteil: ' . ($relation->contributed_share ?: 'k. A.' . "\n"));
+
+                    if (is_numeric($relation->percentage_of_funding)) {
+                        $percentageFunding = number_format(
+                                ($relation->percentage_of_funding / 100) *
+                                $project->third_party_data->funding_amount, 2, ',', '.')
+                            . ' ' . $project->third_party_data->funding_amount_cur;
+                    } else {
+                        $percentageFunding = $relation->percentage_of_funding;
+                    }
+
+                    $cost->createText('an Fördersumme: ' . $percentageFunding . "\n");
+
+                    if (is_numeric($relation->contributed_share)) {
+                        $share = number_format(
+                                ($relation->contributed_share / 100) *
+                                $project->third_party_data->expenses_university, 2, ',', '.')
+                            . ' ' . $project->third_party_data->expenses_university_cur;
+                    } else {
+                        $share = $relation->contributed_share;
+                    }
+
+                    $cost->createText('an Eigenanteil: ' . $share . "\n");
                 }
             } else if (in_array($project->third_party_data->type->name_1, ['Auftragsforschung', 'Kooperation', 'Lizenz'])) {
-                $cost->createText(' Summe (netto): ' .
+                $cost->createText('Summe (netto): ' .
                     number_format($project->third_party_data->contract_sum_netto, 2, ',', '.') .
                     $project->third_party_data->contract_sum_netto_cur
                 );
@@ -675,12 +723,17 @@ class PerformanceRecordController extends AuthenticatedController
             }
 
             // UPA role in project
-            if ($useApplication) {
-                $role = $project->application->participation_role != 0 ?
-                    $project->application->participation_role->name_1 : 'k. A.';
+            if ($project->related_organisations !== null && count($project->related_organisations) > 0) {
+                $internal = $project->related_organisations->filter(function ($o) {
+                    return $o->type === 'internal';
+                });
+                if (count($internal) > 0) {
+                    $role = $internal->first()->role->name_1;
+                } else {
+                    $role = 'k. A.';
+                }
             } else {
-                $role = $project->application !== null && $project->application->participation_role != 0 ?
-                    $project->application->participation_role->name_1 : 'k. A.';
+                $role = 'k. A.';
             }
 
             return [
@@ -717,7 +770,7 @@ class PerformanceRecordController extends AuthenticatedController
 
             // Keywords
             $keywordsText = new RichText();
-            $kwheader = $keywordsText->createTextRun("Verschlagwortung: ");
+            $kwheader = $keywordsText->createTextRun('Verschlagwortung:');
             $kwheader->getFont()->setUnderline(true);
             $keywords = [];
             if ($project->areas != null && count($project->areas) > 0) {
@@ -727,7 +780,11 @@ class PerformanceRecordController extends AuthenticatedController
             } else {
                 $keywords = ['k. A.'];
             }
-            $keywordsText->createText(implode(', ', $keywords));
+            $keywordsText->createText(' ' . implode(', ', $keywords) . "\n\n");
+            $shortdesc = $keywordsText->createTextRun('Kurzbeschreibung:');
+            $shortdesc->getFont()->setUnderline(true);
+            $keywordsText->createText(' ' . ($project->abstract_1 ?:
+                ($project->abstract_2 ?: 'k. A.')));
 
             // List internal persons with their corresponding role.
             $persons = [];
@@ -752,12 +809,26 @@ class PerformanceRecordController extends AuthenticatedController
                 }
             }
 
+            // UPA role in project
+            if ($project->related_organisations !== null && count($project->related_organisations) > 0) {
+                $internal = $project->related_organisations->filter(function ($o) {
+                    return $o->type === 'internal';
+                });
+                if (count($internal) > 0) {
+                    $role = $internal->first()->role->name_1 ?: 'k. A.';
+                } else {
+                    $role = 'k. A.';
+                }
+            } else {
+                $role = 'k. A.';
+            }
+
             return [
                 $name,
                 $durationStatus,
                 $keywordsText,
                 $persons,
-                ''
+                $role
             ];
         }
     }

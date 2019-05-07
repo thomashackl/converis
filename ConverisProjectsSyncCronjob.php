@@ -523,6 +523,60 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 ['project_id', 'card_id']
             );
 
+            // Connect projects and organisations
+            $this->importConverisData(
+                "SELECT DISTINCT
+                    iot_project AS project_id,
+                    iot_organisation AS organisation_id,
+                    'internal' AS type,
+                    role AS role_id,
+                    start_date,
+                    end_date,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_organisation_has_project_internal
+                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                UNION
+                SELECT DISTINCT
+                    iot_project AS project_id,
+                    iot_organisation AS organisation_id,
+                    'external' AS type,
+                    role AS role_id,
+                    start_date,
+                    end_date,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_orga_has_proj_ext
+                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                UNION
+                SELECT DISTINCT
+                    iot_project_general AS project_id,
+                    iot_organisation AS organisation_id,
+                    'internal' AS type,
+                    role AS role_id,
+                    NULL::timestamp AS start_date,
+                    NULL::timestamp AS end_date,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_orga_has_proj_frin
+                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                UNION
+                SELECT DISTINCT
+                    iot_project_general AS project_id,
+                    iot_organisation AS organisation_id,
+                    'external' AS type,
+                    role AS role_id,
+                    NULL::timestamp AS start_date,
+                    NULL::timestamp AS end_date,
+                    c_created_on AS mkdate,
+                    c_updated_on AS chdate
+                FROM rel_orga_has_proj_frex
+                    WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                ORDER BY project_id, organisation_id",
+                'ConverisProjectOrganisationRelation',
+                ['project_id', 'organisation_id']
+            );
+
             // Connect projects and sources of funds.
             $this->importConverisData(
                 "SELECT DISTINCT
