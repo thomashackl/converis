@@ -22,8 +22,8 @@ class ConverisAdmin extends SimpleORMap
         $config['db_table'] = 'converis_admins';
         $config['belongs_to']['user'] = [
             'class_name' => 'User',
-            'foreign_key' => 'username',
-            'assoc_foreign_key' => 'username'
+            'foreign_key' => 'user_id',
+            'assoc_foreign_key' => 'user_id'
         ];
         $config['has_and_belongs_to_many']['institutes'] = [
             'class_name' => 'Institute',

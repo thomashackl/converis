@@ -23,7 +23,7 @@
                     </td>
                     <td>
                         <?= $admin->type == 'local' ?
-                            dgettext('converisplugin', 'Einrichungsbezogen') :
+                            dgettext('converisplugin', 'Einrichtungsbezogen') :
                             dgettext('converisplugin', 'Global') ?>
                     </td>
                     <td>

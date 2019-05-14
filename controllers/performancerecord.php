@@ -38,7 +38,7 @@ class PerformanceRecordController extends AuthenticatedController
     public function before_filter(&$action, &$args) {
         $this->plugin = $this->dispatcher->plugin;
 
-        if (!$GLOBALS['perm']->have_perm('root') && !ConverisAdmin::existsByUsername($GLOBALS['user']->username)) {
+        if (!$GLOBALS['perm']->have_perm('root') && !$this->plugin->checkPermission()) {
             throw new AccessDeniedException();
         }
 
@@ -133,6 +133,10 @@ class PerformanceRecordController extends AuthenticatedController
             ],
             'font' => [
                 'bold' => true
+            ],
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_THIN,
+                'color' => ['rgb' => '000000']
             ]
         ];
         $paleStyle = [
@@ -142,11 +146,19 @@ class PerformanceRecordController extends AuthenticatedController
             ],
             'font' => [
                 'bold' => true
+            ],
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_THIN,
+                'color' => ['rgb' => '000000']
             ]
         ];
         $footerStyle = [
             'font' => [
                 'italic' => true
+            ],
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_THIN,
+                'color' => ['rgb' => '000000']
             ]
         ];
 
@@ -180,10 +192,17 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getStyle('A1')
                 ->getFont()
                 ->setBold(true);
+            $sheet->setCellValue('A1', 'Drittmittelprojekte');
+            $sheet->mergeCells('A2:G2');
+            $sheet->getStyle('A2')
+                ->applyFromArray($greyStyle);
+            $sheet->getStyle('A2')
+                ->getFont()
+                ->setBold(true);
             $sheet->setCellValue('A1', $person->getFullname() .
                 ' (' . $card->organisation->name_1 . ')');
 
-            $row = 3;
+            $row = 4;
 
             foreach ($sections['third_party'] as $index => $section) {
 
@@ -263,10 +282,17 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getStyle('A1')
                 ->getFont()
                 ->setBold(true);
-            $sheet->setCellValue('A1',
+            $sheet->setCellValue('A1','Freie Projekte');
+            $sheet->mergeCells('A2:E2');
+            $sheet->getStyle('A2')
+                ->applyFromArray($greyStyle);
+            $sheet->getStyle('A2')
+                ->getFont()
+                ->setBold(true);
+            $sheet->setCellValue('A2',
                 $person->getFullname() . ' (' . $card->organisation->name_1 . ')');
 
-            $row = 3;
+            $row = 4;
 
             foreach ($sections['free'] as $index => $section) {
 
@@ -653,25 +679,11 @@ class PerformanceRecordController extends AuthenticatedController
                     $costpart = $cost->createTextRun(sprintf("Anteil %s:\n", $relation->card->person->getFullname()));
                     $costpart->getFont()->setUnderline(true);
 
-                    if (is_numeric($relation->percentage_of_funding)) {
-                        $percentageFunding = number_format(
-                                ($relation->percentage_of_funding / 100) *
-                                $project->third_party_data->funding_amount, 2, ',', '.')
-                            . ' ' . $project->third_party_data->funding_amount_cur;
-                    } else {
-                        $percentageFunding = $relation->percentage_of_funding;
-                    }
+                    $percentageFunding = $relation->percentage_of_funding;
 
                     $cost->createText('an Fördersumme: ' . $percentageFunding . "\n");
 
-                    if (is_numeric($relation->contributed_share)) {
-                        $share = number_format(
-                                ($relation->contributed_share / 100) *
-                                $project->third_party_data->expenses_university, 2, ',', '.')
-                            . ' ' . $project->third_party_data->expenses_university_cur;
-                    } else {
-                        $share = $relation->contributed_share;
-                    }
+                    $share = $relation->contributed_share;
 
                     $cost->createText('an Eigenanteil: ' . $share . "\n");
                 }

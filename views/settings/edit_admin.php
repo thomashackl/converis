@@ -1,4 +1,4 @@
-<form class="default" action="<?= $controller->link_for('settings/save_role') ?>" method="post">
+<form class="default" action="<?= $controller->link_for('settings/save_admin') ?>" method="post">
     <section>
         <label for="type">
             <?= dgettext('converisplugin', 'Art der Berechtigung') ?>
@@ -12,7 +12,18 @@
             </option>
         </select>
     </section>
-    <input type="hidden" name="role_id" value="<?= $admin->id ?>">
+    <section>
+        <label>
+            <?= dgettext('converisplugin', 'Benutzer') ?>
+            <?php if ($admin->id != '') : ?>
+                <?= htmlReady($admin->user->getFullname()) ?>
+            <?php else : ?>
+                <?= $usersearch->render() ?>
+            <?php endif ?>
+        </label>
+    </section>
+    <input type="hidden" name="admin_id" value="<?= $admin->id ?>">
+    <?= CSRFProtection::tokenTag() ?>
     <footer data-dialog-button>
         <?= Studip\Button::createAccept(dgettext('converisplugin', 'Berechtigung erteilen'), 'submit') ?>
         <?= Studip\LinkButton::createCancel(_('Abbrechen'), $controller->link_for('settings/roles')) ?>

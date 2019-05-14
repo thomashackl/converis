@@ -44,13 +44,18 @@ class ExportController extends AuthenticatedController
 
         $this->templates = Config::get()->CONVERIS_REPORT_TEMPLATES[$type];
 
-        $currentMonth = date('m');
-        if ($currentMonth < 10) {
-            $this->startDate = '01.10.' . (date('Y') - 1);
-            $this->endDate = '30.09.' . date('Y');
-        } else {
-            $this->startDate = '01.10.' . date('Y');
-            $this->endDate = '30.09.' . (date('Y') + 1);
+        if ($type === 'institute') {
+            $currentMonth = date('m');
+            if ($currentMonth < 10) {
+                $this->startDate = '01.10.' . (date('Y') - 1);
+                $this->endDate = '30.09.' . date('Y');
+            } else {
+                $this->startDate = '01.10.' . date('Y');
+                $this->endDate = '30.09.' . (date('Y') + 1);
+            }
+        } else if ($type === 'user'){
+            $this->startDate = '01.04.' . (date('Y') - 3);
+            $this->endDate = '31.03.' . date('Y');
         }
     }
 

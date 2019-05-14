@@ -72,7 +72,13 @@ class SettingsController extends AuthenticatedController
         Navigation::activateItem('/tools/converisprojects/admins');
         PageLayout::setTitle(dgettext('converisplugin', 'Berechtigungen'));
 
-        $this->admins = ConverisAdmin::findBySQL("1 ORDER BY `username`");
+        $this->admins = ConverisAdmin::findBySQL("1");
+        usort($this->admins, function ($a, $b) {
+            return strnatcasecmp(
+                $a->user->nachname . '_' . $a->user->vorname . '_' . $a->user->username,
+                $b->user->nachname . '_' . $b->user->vorname . '_' . $b->user->username
+            );
+        });
 
         $actions = new ActionsWidget();
         $actions->addLink(dgettext('converisplugin', 'Admin hinzufügen'),
@@ -90,13 +96,40 @@ class SettingsController extends AuthenticatedController
     {
         Navigation::activateItem('/tools/converisprojects/admins');
 
+        SimpleORMap::expireTableScheme();
+
         $title = $admin_id ?
             dgettext('converisplugin', 'Berechtigung bearbeiten') :
             dgettext('converisplugin', 'Berechtigung erteilen');
 
         PageLayout::setTitle($title);
 
-        $this->admin = $admin_id ? ConverisAdmin::find($admin_id) : new ConverisAdmin();
+        $this->admin = $admin_id != '' ? ConverisAdmin::find($admin_id) : new ConverisAdmin();
+        $this->usersearch = QuickSearch::get('user_id', new StandardSearch('user_id'))
+            ->withButton();
+    }
+
+    public function save_admin_action()
+    {
+        CSRFProtection::verifyUnsafeRequest();
+
+        if (Request::option('admin_id') != '') {
+            $admin = ConverisAdmin::find(Request::option('admin_id'));
+        } else {
+            $admin = new ConverisAdmin();
+            $admin->user_id = Request::option('user_id');
+            $admin->mkdate = date('Y-m-d H:i:s');
+        }
+        $admin->type = Request::option('type');
+        $admin->chdate = date('Y-m-d H:i:s');
+
+        if ($admin->store()) {
+            PageLayout::postSuccess(dgettext('converisplugin', 'Die Einstellungen wurden gespeichert.'));
+        } else {
+            PageLayout::postError(dgettext('converisplugin', 'Die Einstellungen konnten nicht gespeichert werden.'));
+        }
+
+        $this->relocate('settings/admins');
     }
 
     public function delete_admin_action($admin_id)

@@ -9,7 +9,7 @@ class Init extends Migration {
         DBManager::get()->execute("CREATE TABLE IF NOT EXISTS `converis_admins`
         (
             `admin_id` INT NOT NULL AUTO_INCREMENT,
-            `username` VARCHAR(32) REFERENCES `auth_user_md5`.`username`,
+            `user_id` VARCHAR(32) REFERENCES `auth_user_md5`.`user_id`,
             `type` ENUM('global', 'local') NOT NULL DEFAULT 'local',
             `mkdate` DATETIME NOT NULL,
             `chdate` DATETIME NOT NULL,
