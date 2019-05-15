@@ -141,7 +141,7 @@ class SettingsController extends AuthenticatedController
             PageLayout::postError(dgettext('converisplugin', 'Die Berechtigung konnte nicht entfernt werden.'));
         }
 
-        $this->relocate('/settings/admins');
+        $this->relocate('settings/admins');
     }
 
     // customized #url_for for plugins
