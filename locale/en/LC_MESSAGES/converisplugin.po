@@ -3,239 +3,240 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: Thomas Hackl <thomas.hackl@uni-passau.de>\n"
 "POT-Creation-Date: 2019-05-16 13:01+0200\n"
-"PO-Revision-Date: 2019-05-16 13:01+0200\n"
-"Last-Translator: Thomas Hackl <thomas.hackl@uni-passau.de>\n"
-"Language-Team: Thomas Hackl <thomas.hackl@uni-passau.de>\n"
+"PO-Revision-Date: 2019-05-16 11:13+0000\n"
+"Last-Translator: Thomas Hackl <Thomas.Hackl@uni-passau.de>\n"
+"Language-Team: English <https://develop.intelec.uni-passau.de/weblate/"
+"weblate/projects/studip/converisprojects/en/>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 3.5-dev\n"
 
 #: ConverisProjectsSyncCronjob.php:25
 msgid "Synchronisiere Forschungsprojekte aus Converis"
-msgstr ""
+msgstr "Synchronize research projects with Converis data"
 
 #: ConverisProjectsSyncCronjob.php:29
 msgid "Holt alle Forschungsprojekte inkl. Daten aus Converis"
-msgstr ""
+msgstr "Gets all research project data from Converis"
 
 #: controllers/settings.php:48
 msgid "Vorlagen für Forschungsberichte"
-msgstr ""
+msgstr "Research report templates"
 
 #: controllers/settings.php:62
 msgid "Die Berichtsvorlagen wurden gespeichert."
-msgstr ""
+msgstr "The report templates have been saved."
 
 #: controllers/settings.php:73 ConverisProjectsPlugin.class.php:38
 msgid "Berechtigungen"
-msgstr ""
+msgstr "Permissions"
 
 #: controllers/settings.php:84
 msgid "Admin hinzufügen"
-msgstr ""
+msgstr "Add admin"
 
 #: controllers/settings.php:102
 msgid "Berechtigung bearbeiten"
-msgstr ""
+msgstr "Edit permission"
 
 #: controllers/settings.php:103 views/settings/edit_admin.php:28
 msgid "Berechtigung erteilen"
-msgstr ""
+msgstr "Grant permission"
 
 #: controllers/settings.php:127
 msgid "Die Einstellungen wurden gespeichert."
-msgstr ""
+msgstr "The settings have been saved."
 
 #: controllers/settings.php:129
 msgid "Die Einstellungen konnten nicht gespeichert werden."
-msgstr ""
+msgstr "The settings could not be saved."
 
 #: controllers/settings.php:139
 msgid "Die Berechtigung wurde entfernt."
-msgstr ""
+msgstr "The permission has been revoked."
 
 #: controllers/settings.php:141
 msgid "Die Berechtigung konnte nicht entfernt werden."
-msgstr ""
+msgstr "The permission could not be revoked."
 
 #: controllers/projects.php:64
 msgid "Kontext auswählen"
-msgstr ""
+msgstr "Select context"
 
 #: controllers/projects.php:98
 #, php-format
 msgid "Es wurden keine Projekte für %s gefunden"
-msgstr ""
+msgstr "No projects were found for %s"
 
 #: controllers/projects.php:118
 #, php-format
 msgid "Liste der Forschungsprojekte für %s"
-msgstr ""
+msgstr "Research projects for %s"
 
 #: controllers/projects.php:121
 msgid "Projekte"
-msgstr ""
+msgstr "Projects"
 
 #: controllers/projects.php:123
 msgid "Auswahl"
-msgstr ""
+msgstr "Selection"
 
 #: controllers/projects.php:127
 msgid "Projektliste"
-msgstr ""
+msgstr "Project list"
 
 #: controllers/projects.php:133 controllers/export.php:40
 msgid "Forschungsbericht erstellen"
-msgstr ""
+msgstr "Create research report"
 
 #: views/settings/templates.php:9
 msgid "Bezeichnung"
-msgstr ""
+msgstr "Label"
 
 #: views/settings/templates.php:16
 msgid "Aufzurufender Controller"
-msgstr ""
+msgstr "Controller to call"
 
 #: views/settings/templates.php:23
 msgid "Aufzurufende Action"
-msgstr ""
+msgstr "Action to call"
 
 #: views/settings/templates.php:32
 msgid "Einstellungen speichern"
-msgstr ""
+msgstr "Save settings"
 
 #: views/settings/edit_admin.php:4
 msgid "Art der Berechtigung"
-msgstr ""
+msgstr "Kind of permission"
 
 #: views/settings/edit_admin.php:8 views/settings/admins.php:26
 msgid "Einrichtungsbezogen"
-msgstr ""
+msgstr "Institute related"
 
 #: views/settings/edit_admin.php:11 views/settings/admins.php:27
 msgid "Global"
-msgstr ""
+msgstr "Global"
 
 #: views/settings/edit_admin.php:17
 msgid "Benutzer"
-msgstr ""
+msgstr "User"
 
 #: views/settings/edit_admin.php:29 views/export/settings.php:41
 msgid "Abbrechen"
-msgstr ""
+msgstr "Cancel"
 
 #: views/settings/admins.php:4
 msgid "Admins für Forschungsprojekte und -berichte"
-msgstr ""
+msgstr "Research project and report admins"
 
 #: views/settings/admins.php:13
 msgid "Person"
-msgstr ""
+msgstr "Person"
 
 #: views/settings/admins.php:14
 msgid "Rechte"
-msgstr ""
+msgstr "Permissions"
 
 #: views/settings/admins.php:15
 msgid "Einrichtungen"
-msgstr ""
+msgstr "Institutes"
 
 #: views/settings/admins.php:16
 msgid "Aktionen"
-msgstr ""
+msgstr "Actions"
 
 #: views/settings/admins.php:43
 #, php-format
 msgid "Soll die Berechtigung für %s wirklich gelöscht werden?"
-msgstr ""
+msgstr "Shall the permission for %s really be revoked?"
 
 #: views/settings/admins.php:52
 msgid "Es wurden keine Admins zugewiesen."
-msgstr ""
+msgstr "No admins have been assigned."
 
 #: views/projects/index.php:4
 msgid "Welche Forschungsprojekte sollen angezeigt werden?"
-msgstr ""
+msgstr "Which research projects shall be shown?"
 
 #: views/projects/index.php:8
 msgid "für eine Einrichtung"
-msgstr ""
+msgstr "for an institute"
 
 #: views/projects/index.php:12
 msgid "für eine Person"
-msgstr ""
+msgstr "for a person"
 
 #: views/projects/index.php:17
 msgid "Einrichtung wählen"
-msgstr ""
+msgstr "Select institute"
 
 #: views/projects/index.php:28
 msgid "Person wählen"
-msgstr ""
+msgstr "Select person"
 
 #: views/projects/index.php:33
 msgid "Projekte laden"
-msgstr ""
+msgstr "Load projects"
 
 #: views/projects/list.php:3
 #, php-format
 msgid "Ein Forschungsprojekt für %2$s"
 msgid_plural "%1$u Forschungsprojekte für %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "One research project for %2$s"
+msgstr[1] "%1$u research projects for %2$s"
 
 #: views/projects/list.php:17
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: views/projects/list.php:18 views/export/settings.php:8
 msgid "Beginn"
-msgstr ""
+msgstr "Start"
 
 #: views/projects/list.php:19 views/export/settings.php:14
 msgid "Ende"
-msgstr ""
+msgstr "End"
 
 #: views/projects/list.php:20
 msgid "Personen"
-msgstr ""
+msgstr "Persons"
 
 #: views/projects/list.php:21
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: views/export_templates/fim_pdf.php:168
 msgid "bis"
-msgstr ""
+msgstr "until"
 
 #: views/export/settings.php:4
 msgid "Berichtszeitraum"
-msgstr ""
+msgstr "Report timespan"
 
 #: views/export/settings.php:21
 msgid "Exportvorlage"
-msgstr ""
+msgstr "Export template"
 
 #: views/export/settings.php:25
 msgid "Vorlage wählen"
-msgstr ""
+msgstr "Select template"
 
 #: views/export/settings.php:40
 msgid "Bericht erzeugen"
-msgstr ""
+msgstr "Generate report"
 
 #: ConverisProjectsPlugin.class.php:30 ConverisProjectsPlugin.class.php:50
 msgid "Forschungsprojekte"
-msgstr ""
+msgstr "Research projects"
 
 #: ConverisProjectsPlugin.class.php:35
 msgid "Berichtsvorlagen"
-msgstr ""
+msgstr "Report templates"
