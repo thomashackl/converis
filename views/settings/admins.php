@@ -22,7 +22,7 @@
                         <?= htmlReady($admin->user->getFullname('full_rev_username')) ?>
                     </td>
                     <td>
-                        <?= $admin->type == 'local' ?
+                        <?= $admin->type === 'local' ?
                             dgettext('converisplugin', 'Einrichtungsbezogen') :
                             dgettext('converisplugin', 'Global') ?>
                     </td>

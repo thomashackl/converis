@@ -7,7 +7,7 @@
             <option value="local">
                 <?= dgettext('converisplugin', 'Einrichtungsbezogen') ?>
             </option>
-            <option value="local">
+            <option value="global">
                 <?= dgettext('converisplugin', 'Global') ?>
             </option>
         </select>
