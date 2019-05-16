@@ -55,7 +55,7 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
 
     public function checkPermission()
     {
-        return ConverisAdmin::existsByUser_id($GLOBALS['user']->id);
+        return count(ConverisAdmin::findByUser_id($GLOBALS['user']->id)) > 0;
     }
 
     public function perform($unconsumed_path) {
