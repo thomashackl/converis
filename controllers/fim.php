@@ -19,8 +19,7 @@ require_once(__DIR__ . '/../vendor/autoload.php');
 
 use Mpdf\Mpdf;
 
-class FIM extends AuthenticatedController
-class FIM extends AuthenticatedController
+class FIMController extends AuthenticatedController
 {
 
     /**
@@ -69,10 +68,16 @@ class FIM extends AuthenticatedController
 
         }
 
+        $this->set_content_type('application/pdf');
+        $this->response->add_header('Cache-Control', 'cache, must-revalidate');
+        $this->response->add_header('Pragma', 'public');
+
         $mpdf = new Mpdf(['orientation' => 'L']);
         $mpdf->setFooter('Daten vom ' . date('d.m.Y H:i') . ', Seite {PAGENO}/{nb}');
         $mpdf->WriteHTML($this->render_template_as_string('export_templates/fim_pdf'));
         $mpdf->Output('Drittmittelprojekte-' . $this->institute->name . '-' . $this->start . '-' . $this->end . '.pdf', 'D');
+
+        $this->render_nothing();
     }
 
 }

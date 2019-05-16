@@ -58,8 +58,8 @@ class ConverisOrganisation extends SimpleORMap
         $organisations = DBManager::get()->fetchAll("SELECT DISTINCT o.*
             FROM `converis_organisations` o
                 JOIN `converis_cards` c ON (c.`organisation_id` = o.`organisation_id`)
-                JOIN `converis_project_card` pc ON (pc.`card_id` = co.`card_id`)
-                JOIN `converis_projects` p ON (p.`converis_id` = pc.`project_id`)
+                JOIN `converis_project_card` pc ON (pc.`card_id` = c.`card_id`)
+                JOIN `converis_projects` p ON (p.`project_id` = pc.`project_id`)
             WHERE p.`project_id` = :id
                 AND pc.`type` IN (:types)
             ORDER BY o.`name_1`",

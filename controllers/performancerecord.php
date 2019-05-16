@@ -17,13 +17,13 @@
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
+use Mpdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PerformanceRecordController extends AuthenticatedController
@@ -46,66 +46,12 @@ class PerformanceRecordController extends AuthenticatedController
         $this->set_layout(null);
     }
 
-    public function xls_action($start, $end, $username, $format = 'xls')
+    public function xls_action($start, $end, $username)
     {
         $this->start = new DateTime($start);
         $this->end = new DateTime($end);
 
-        $startDate = $this->start->getTimestamp();
-        $endDate = $this->end->getTimestamp();
-
-        $sections = [
-            'third_party' => [
-                'third_party_submitted' => [
-                    'title' => 'Anträge eingereicht - gemeinnützig begutachtete Forschung',
-                    'columns' => [
-                        'Mittelgeber/Förderprogramm',
-                        'Kurzbezeichnung | Langbezeichnung',
-                        'Laufzeit an der Universität Passau (geplant)',
-                        'Finanzen (beantragt)',
-                        'Verschlagwortung (DFG, Destatis sowie freie Schlagworte)',
-                        'Beteiligte interne Personen und deren Rolle im Projekt',
-                        'Rolle Universität Passau im Projekt'
-                    ]
-                ],
-                'third_party_1' => [
-                    'title' => 'Projekte bewilligt - gemeinnützig begutachtete Forschung',
-                    'columns' => [
-                        'Mittelgeber/Förderprogramm',
-                        'Kurzbezeichnung | Langbezeichnung',
-                        'Laufzeit an der Universität Passau',
-                        'Finanzen',
-                        'Verschlagwortung (DFG, Destatis sowie freie Schlagworte)',
-                        'Beteiligte interne Personen und deren Rolle im Projekt',
-                        'Rolle Universität Passau im Projekt'
-                    ]
-                ],
-                'third_party_2' => [
-                    'title' => 'Projekte bewilligt - wirtschaftliche Tätigkeit',
-                    'columns' => [
-                        'Vertragspartner',
-                        'Kurzbezeichnung | Langbezeichnung',
-                        'Laufzeit an der Universität Passau',
-                        'Finanzen',
-                        'Verschlagwortung (DFG, Destatis sowie freie Schlagworte)',
-                        'Beteiligte interne Personen und deren Rolle im Projekt',
-                        'Rolle Universität Passau im Projekt'
-                    ]
-                ]
-            ],
-            'free' => [
-                'free' => [
-                    'title' => 'Freie Projekte',
-                    'columns' => [
-                        'Kurzbezeichnung | Langbezeichnung',
-                        'Laufzeit | Status',
-                        'Verschlagwortung | Kurzbeschreibung',
-                        'Beteiligte interne Personen und deren Rolle im Projekt',
-                        'Rolle Universität Passau im Projekt'
-                    ]
-                ]
-            ]
-        ];
+        $sections = $this->getSections();
 
         $person = ConverisPerson::findOneByUsername($username);
 
@@ -133,10 +79,6 @@ class PerformanceRecordController extends AuthenticatedController
             ],
             'font' => [
                 'bold' => true
-            ],
-            'allBorders' => [
-                'borderStyle' => Border::BORDER_THIN,
-                'color' => ['rgb' => '000000']
             ]
         ];
         $paleStyle = [
@@ -146,19 +88,11 @@ class PerformanceRecordController extends AuthenticatedController
             ],
             'font' => [
                 'bold' => true
-            ],
-            'allBorders' => [
-                'borderStyle' => Border::BORDER_THIN,
-                'color' => ['rgb' => '000000']
             ]
         ];
         $footerStyle = [
             'font' => [
                 'italic' => true
-            ],
-            'allBorders' => [
-                'borderStyle' => Border::BORDER_THIN,
-                'color' => ['rgb' => '000000']
             ]
         ];
 
@@ -221,7 +155,7 @@ class PerformanceRecordController extends AuthenticatedController
 
                     for ($col = 'A'; $col <= 'G'; $col++) {
                         $sheet->getStyle($col . $row)
-                            ->applyFromArray($greyStyle);
+                            ->applyFromArray(array_merge($greyStyle, $borderStyle));
                     }
 
                     $sheet->fromArray($section['columns'], '', 'A' . $row);
@@ -246,7 +180,7 @@ class PerformanceRecordController extends AuthenticatedController
             }
 
             $sheet->getStyle('A' . $row)
-                ->applyFromArray($paleStyle)
+                ->applyFromArray(array_merge($paleStyle, $borderStyle))
                 ->getFont()
                 ->setBold(false);
             $sheet->setCellValue('A' . $row, 'Anträge abgelehnt: ' .
@@ -278,14 +212,14 @@ class PerformanceRecordController extends AuthenticatedController
             // Set header line.
             $sheet->mergeCells('A1:E1');
             $sheet->getStyle('A1')
-                ->applyFromArray($greyStyle);
+                ->applyFromArray(array_merge($greyStyle, $borderStyle));
             $sheet->getStyle('A1')
                 ->getFont()
                 ->setBold(true);
             $sheet->setCellValue('A1','Freie Projekte');
             $sheet->mergeCells('A2:E2');
             $sheet->getStyle('A2')
-                ->applyFromArray($greyStyle);
+                ->applyFromArray(array_merge($greyStyle, $borderStyle));
             $sheet->getStyle('A2')
                 ->getFont()
                 ->setBold(true);
@@ -301,7 +235,7 @@ class PerformanceRecordController extends AuthenticatedController
                     $sheet->mergeCells('A' . $row . ':E' . $row);
 
                     $sheet->getStyle('A' . $row)
-                        ->applyFromArray($paleStyle);
+                        ->applyFromArray(array_merge($paleStyle, $borderStyle));
 
                     $sheet->setCellValue('A' . $row, $section['title']);
 
@@ -311,7 +245,7 @@ class PerformanceRecordController extends AuthenticatedController
 
                     for ($col = 'A'; $col <= 'E'; $col++) {
                         $sheet->getStyle($col . $row)
-                            ->applyFromArray($greyStyle);
+                            ->applyFromArray(array_merge($greyStyle, $borderStyle));
                     }
 
                     $sheet->fromArray($section['columns'], '', 'A' . $row);
@@ -349,18 +283,13 @@ class PerformanceRecordController extends AuthenticatedController
 
         $spreadsheet->setActiveSheetIndex(0);
 
-        $filename = 'leistungsbezuege-' . strtolower($person->last_name);
+        $filename = 'Leistungsbezüge-' . $person->getFullName() . '-' .
+            $this->start->format('d.m.Y') . '-' .
+            $this->end->format('d.m.Y');
 
-        if ($format === 'xls') {
-            $writer = new Xlsx($spreadsheet);
-            $filename .= '.xlsx';
-            $this->set_content_type('vnd.openxmlformats-officedocument. spreadsheetml.sheet');
-        } else if ($format === 'pdf') {
-            $writer = new Mpdf($spreadsheet);
-            $filename .= '.pdf';
-            $this->set_content_type('application/pdf');
-            $writer->writeAllSheets();
-        }
+        $writer = new Xlsx($spreadsheet);
+        $filename .= '.xlsx';
+        $this->set_content_type('vnd.openxmlformats-officedocument. spreadsheetml.sheet');
 
         $this->response->add_header('Content-Disposition',
             'attachment;' . encode_header_parameter('filename', $filename));
@@ -382,13 +311,86 @@ class PerformanceRecordController extends AuthenticatedController
      */
     public function pdf_action($start, $end, $username)
     {
-        $this->relocate('performancerecord/xls', $start, $end, $username, 'pdf');
+        $this->sections = $this->getSections();
+        $this->person = ConverisPerson::findOneByUsername($username);
+        $this->start = new DateTime($start);
+        $this->end = new DateTime($end);
+        $this->dataExists = false;
+
+        $this->set_content_type('application/pdf');
+        $this->response->add_header('Cache-Control', 'cache, must-revalidate');
+        $this->response->add_header('Pragma', 'public');
+
+        $mpdf = new Mpdf(['orientation' => 'L']);
+        $mpdf->setHTMLFooter('Stand: ' . date('d.m.Y') . ', Seite {PAGENO}/{nb}', 'OE');
+        $mpdf->WriteHTML($this->render_template_as_string('export_templates/performancerecord_pdf'));
+        $mpdf->Output('Leistungsbezüge-' . $this->person->getFullName() . '-' .
+            $this->start->format('d.m.Y') . '-' .
+            $this->end->format('d.m.Y') . '.pdf', 'D');
+
+        $this->render_nothing();
     }
 
-    private function getProjects($card)
+    private function getSections()
+    {
+        return [
+            'third_party' => [
+                'third_party_submitted' => [
+                    'title' => 'Anträge eingereicht - gemeinnützig begutachtete Forschung',
+                    'columns' => [
+                        'Mittelgeber/Förderprogramm',
+                        'Kurzbezeichnung | Langbezeichnung',
+                        'Laufzeit an der Universität Passau (geplant)',
+                        'Finanzen (beantragt)',
+                        'Verschlagwortung (DFG, Destatis sowie freie Schlagworte)',
+                        'Beteiligte interne Personen und deren Rolle im Projekt',
+                        'Rolle Universität Passau im Projekt'
+                    ]
+                ],
+                'third_party_1' => [
+                    'title' => 'Projekte bewilligt - gemeinnützig begutachtete Forschung',
+                    'columns' => [
+                        'Mittelgeber/Förderprogramm',
+                        'Kurzbezeichnung | Langbezeichnung',
+                        'Laufzeit an der Universität Passau',
+                        'Finanzen',
+                        'Verschlagwortung (DFG, Destatis sowie freie Schlagworte)',
+                        'Beteiligte interne Personen und deren Rolle im Projekt',
+                        'Rolle Universität Passau im Projekt'
+                    ]
+                ],
+                'third_party_2' => [
+                    'title' => 'Projekte bewilligt - wirtschaftliche Tätigkeit',
+                    'columns' => [
+                        'Vertragspartner',
+                        'Kurzbezeichnung | Langbezeichnung',
+                        'Laufzeit an der Universität Passau',
+                        'Finanzen',
+                        'Verschlagwortung (DFG, Destatis sowie freie Schlagworte)',
+                        'Beteiligte interne Personen und deren Rolle im Projekt',
+                        'Rolle Universität Passau im Projekt'
+                    ]
+                ]
+            ],
+            'free' => [
+                'free' => [
+                    'title' => 'Freie Projekte',
+                    'columns' => [
+                        'Kurzbezeichnung | Langbezeichnung',
+                        'Laufzeit | Status',
+                        'Verschlagwortung | Kurzbeschreibung',
+                        'Beteiligte interne Personen und deren Rolle im Projekt',
+                        'Rolle Universität Passau im Projekt'
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    public function getProjects($card)
     {
         $projects = [
-            'count' => 0,
+            'count' => ['free' => 0, 'third_party' => 0],
             'third_party_submitted' => [],
             'third_party_1' => [],
             'third_party_2' => [],
@@ -457,9 +459,10 @@ class PerformanceRecordController extends AuthenticatedController
                 }
             }
 
-            $projects['count'] = count($projects['third_party_submitted']) + count($projects['third_party_1']) +
-                count($projects['third_party_2']) + count($projects['third_party_declined']) +
-                count($projects['free']);
+            $projects['count']['third_party'] = count($projects['third_party_submitted']) +
+                count($projects['third_party_1']) + count($projects['third_party_2']) +
+                count($projects['third_party_declined']);
+            $projects['count']['free'] = count($projects['free']);
 
             /*
              * Sort projects.
@@ -501,7 +504,7 @@ class PerformanceRecordController extends AuthenticatedController
      * @return array
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    private function makeTexts(&$relation)
+    public function makeTexts(&$relation)
     {
         $project = $relation->project;
 
