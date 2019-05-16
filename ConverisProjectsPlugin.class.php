@@ -21,6 +21,9 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
 
         StudipAutoloader::addAutoloadPath(__DIR__ . '/models');
 
+        // Localization
+        bindtextdomain('converisplugin', realpath(__DIR__.'/locale'));
+
         // Plugin only available for roots or role.
         if ($GLOBALS['perm']->have_perm('root') || ConverisAdmin::findOneByUser_id($GLOBALS['user']->id)) {
             $navigation = new Navigation($this->getDisplayName(),
