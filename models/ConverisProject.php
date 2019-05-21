@@ -67,22 +67,25 @@ class ConverisProject extends SimpleORMap
         ];
         $config['has_many']['related_cards'] = [
             'class_name' => 'ConverisProjectCardRelation',
-            'foreign_key' => 'project_id'
+            'foreign_key' => 'project_id',
+            'order_by' => 'ORDER BY `order_card'
         ];
         $config['has_many']['related_organisations'] = [
             'class_name' => 'ConverisProjectOrganisationRelation',
-            'foreign_key' => 'project_id'
+            'foreign_key' => 'project_id',
+            'order_by' => 'ORDER BY `order_organisation'
         ];
         $config['has_and_belongs_to_many']['areas'] = [
             'class_name' => 'ConverisArea',
             'thru_table' => 'converis_project_area',
             'thru_key' => 'project_id',
             'thru_assoc_key' => 'area_id',
-            'order_by' => 'ORDER BY `short_description`',
+            'order_by' => 'ORDER BY `order_area`',
         ];
         $config['has_many']['related_sources_of_funds'] = [
             'class_name' => 'ConverisProjectSourceOfFundsRelation',
-            'foreign_key' => 'project_id'
+            'foreign_key' => 'project_id',
+            'order_by' => 'ORDER BY `order_source_of_funds'
         ];
         parent::configure($config);
     }

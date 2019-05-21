@@ -477,6 +477,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     percentage_of_funding,
                     start_date,
                     end_date,
+                    iot_project_seq AS order_project,
+                    iot_card_seq AS order_card,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_card_has_project_int
@@ -492,6 +494,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
+                    iot_project_seq AS order_project,
+                    iot_card_seq AS order_card,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_card_has_project_ext
@@ -507,6 +511,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
+                    iot_project_general_seq AS order_project,
+                    iot_card_seq AS order_card,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_card_has_proj_frin
@@ -522,6 +528,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
+                    iot_project_general_seq AS order_project,
+                    iot_card_seq AS order_card,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_card_has_proj_frex
@@ -540,6 +548,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     role AS role_id,
                     start_date,
                     end_date,
+                    iot_project_seq AS order_project,
+                    iot_organisation_seq AS order_organisation,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_organisation_has_project_internal
@@ -552,6 +562,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     role AS role_id,
                     start_date,
                     end_date,
+                    iot_project_seq AS order_project,
+                    iot_organisation_seq AS order_organisation,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_orga_has_proj_ext
@@ -564,6 +576,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     role AS role_id,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
+                    iot_project_general_seq AS order_project,
+                    iot_organisation_seq AS order_organisation,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_orga_has_proj_frin
@@ -576,6 +590,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     role AS role_id,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
+                    iot_project_general_seq AS order_project,
+                    iot_organisation_seq AS order_organisation,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_orga_has_proj_frex
@@ -591,6 +607,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     ps.iot_project AS project_id,
                     ps.iot_source_of_funds AS source_id,
                     ps.amount,
+                    iot_project_seq AS order_project,
+                    iot_source_of_funds_seq AS order_source_of_funds,
                     ps.c_created_on AS mkdate,
                     ps.c_updated_on AS chdate
                 FROM rel_proj_has_soof ps
@@ -608,6 +626,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 "SELECT DISTINCT
                     iot_project AS project_id,
                     iot_area AS area_id,
+                    iot_project_seq AS order_project,
+                    iot_area_seq AS order_area,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_area_has_project
@@ -616,6 +636,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 SELECT DISTINCT
                     iot_project_general AS project_id,
                     iot_area AS area_id,
+                    iot_project_general_seq AS order_project,
+                    iot_area_seq AS order_area,
                     c_created_on AS mkdate,
                     c_updated_on AS chdate
                 FROM rel_area_has_proj_free

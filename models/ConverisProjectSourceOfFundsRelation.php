@@ -12,9 +12,11 @@
  * @license     http://www.gnu.org/licenses/gpl-2.0.html GPL version 2
  * @category    ConverisProjects
  *
- * @property string project_id database column
- * @property string source_id database column
+ * @property int project_id database column
+ * @property int source_id database column
  * @property string amount database column
+ * @property int order_source_of_funds database column
+ * @property int order_project database column
  * @property string mkdate database column
  * @property string chdate database column
  * @property string id computed column read/write
