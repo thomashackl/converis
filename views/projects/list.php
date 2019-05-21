@@ -24,7 +24,7 @@
     <tbody>
         <?php foreach ($projects as $project) : ?>
             <tr>
-                <td><?= htmlReady($project->name) ?> (<?= $project->project_id ?>)</td>
+                <td><?= htmlReady($project->name) ?></td>
                 <td data-sort-value="<?= strtotime(htmlReady($project->start_date)) ?>">
                     <?= htmlReady(strtotime($project->start_date) > 0 ?
                         date('d.m.Y', strtotime($project->start_date)) :
