@@ -632,10 +632,10 @@ class PerformanceRecordController extends AuthenticatedController
                 $cost->createText('Förderquote: ' .
                     ($useApplication ?
                         ($project->application->funding_quota ?
-                            $project->application->funding_quota . ' %' :
+                            $project->application->funding_quota :
                             'k. A.') :
                         ($project->third_party_data->funding_quota ?
-                            $project->third_party_data->funding_quota . ' %' :
+                            $project->third_party_data->funding_quota :
                             'k. A.')
                     ) . "\n");
                 $cost->createText('Eigenanteil Projektteam: ' .
