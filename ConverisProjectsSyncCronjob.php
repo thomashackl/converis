@@ -150,6 +150,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
                     LEFT JOIN rel_application_has_project a ON (a.iot_project = p.id)
                 WHERE p.name IS NOT NULL
+                    AND s.status_process <> 5
                     AND s.infoobjecttype = 172
                     AND (p.c_created_on > :tstamp OR p.c_updated_on > :tstamp)
                 UNION
@@ -173,7 +174,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     p.url,
                     p.start_date,
                     p.end_date,
-                    s.status_process AS status,
+                    s.status_process AS status_id,
                     p.ispublic AS is_public,
                     a.iot_application AS application_id,
                     p.c_created_on AS mkdate,
@@ -182,6 +183,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
                     LEFT JOIN rel_application_has_project a ON (a.iot_project = p.id)
                 WHERE p.name IS NOT NULL
+                    AND s.status_process <> 5
                     AND s.infoobjecttype = 36
                     AND (p.c_created_on > :tstamp OR p.c_updated_on > :tstamp)
                 ORDER BY project_id",
@@ -243,6 +245,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     LEFT JOIN choicegroupvalue c9 ON (c9.id = p.own_contribution_cur)
                     LEFT JOIN choicegroupvalue c10 ON (c10.id = p.funding_amount_cur)
                 WHERE s.infoobjecttype = 36
+                    AND s.status_process <> 5
                     AND p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
                 ORDER BY project_id",
                 'ConverisProjectThirdPartyData',
@@ -285,7 +288,10 @@ class ConverisProjectsSyncCronjob extends CronJob {
             $this->importConverisData(
                 "SELECT DISTINCT
                     p.id AS person_id,
-                    p.ldap_person_id AS username,
+                    CASE
+                        WHEN p.ldap_person_id IS NOT NULL THEN p.ldap_person_id
+                        ELSE u.login
+                    END AS username,
                     p.first_name,
                     p.last_name,
                     c2.value_1 AS academic_title,
@@ -298,6 +304,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 FROM iot_person p
                     LEFT JOIN choicegroupvalue c1 ON (c1.id = p.external)
                     LEFT JOIN choicegroupvalue c2 ON (c2.id = p.academic_title)
+                    LEFT JOIN convuserhaspremrole r ON (r.infoobject = p.id)
+                    LEFT JOIN converisuser u ON (u.id = r.converisuser)
                 WHERE p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
                 ORDER BY person_id",
                 'ConverisPerson',
