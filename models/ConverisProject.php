@@ -163,7 +163,7 @@ class ConverisProject extends SimpleORMap
                         $declined = new DateTime($this->third_party_data->date_of_grant_agreement);
                         $runs = $declined >= $start && $declined <= $end;
                         break;
-                    case 'Beantragt':
+                    case 'Bei Mittelgeber eingereicht':
                         $deadline = new DateTime($this->application->deadline);
                         $runs = $deadline >= $start && $deadline <= $end;
                         break;
