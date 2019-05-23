@@ -163,24 +163,24 @@ class ConverisProject extends SimpleORMap
                         $declined = new DateTime($this->third_party_data->date_of_grant_agreement);
                         $runs = $declined >= $start && $declined <= $end;
                         break;
+                    case 'Beantragt':
+                        $deadline = new DateTime($this->application->deadline);
+                        $runs = $deadline >= $start && $deadline <= $end;
+                        break;
                     case 'Bewilligt':
                     case 'Beendet':
                         switch ($this->third_party_data->type->name_1) {
-                            case 'Beantragt':
-                                $deadline = new DateTime($this->application->deadline);
-                                $runs = $deadline >= $start && $deadline <= $end;
-                                break;
                             case 'EU':
                             case 'International':
                             case 'National':
                                 $granted = new DateTime($this->third_party_data->date_of_grant_agreement);
-                                $runs = ($pEnd >= $start && $pEnd <= $end) ||
+                                $runs = ($pEnd >= $start) ||
                                     ($pEnd->getTimestamp() <= 0 && $granted >= $start && $granted <= $end);
                                 break;
                             case 'Auftragsforschung':
                             case 'Kooperation':
                             case 'Lizenz':
-                                $runs = ($pEnd >= $start && $pEnd <= $end) || $pEnd->getTimestamp() <= 0;
+                                $runs = ($pEnd >= $start) || $pEnd->getTimestamp() <= 0;
                                 break;
                         }
                         break;

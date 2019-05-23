@@ -17,7 +17,7 @@
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
-use Mpdf\Mpdf;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -46,7 +46,17 @@ class PerformanceRecordController extends AuthenticatedController
         $this->set_layout(null);
     }
 
-    public function xls_action($start, $end, $username)
+    /**
+     * Generate output for Excel.
+     *
+     * @param $start
+     * @param $end
+     * @param $username
+     * @param string $format
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
+    public function xls_action($start, $end, $username, $format = 'xls')
     {
         $this->start = new DateTime($start);
         $this->end = new DateTime($end);
@@ -55,21 +65,16 @@ class PerformanceRecordController extends AuthenticatedController
 
         $person = ConverisPerson::findOneByUsername($username);
 
-        $spreadsheet = new Spreadsheet();
-        $spreadsheet->getProperties()
-            ->setCreator($GLOBALS['user']->getFullname())
-            ->setLastModifiedBy($GLOBALS['user']->getFullname())
-            ->setTitle('Leistungsbezüge ' . $person->getFullname())
-            ->setSubject('Leistungsbezüge ' . $person->getFullname());
-        $spreadsheet->removeSheetByIndex(0);
-        $spreadsheet->getDefaultStyle()->getAlignment()->setWrapText(true);
-        $spreadsheet->getDefaultStyle()->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
-
         // Some style definitions for consistent usage.
         $borderStyle = [
             'allBorders' => [
                 'borderStyle' => Border::BORDER_THIN,
                 'color' => ['rgb' => '000000']
+            ]
+        ];
+        $noBordersStyle = [
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_NONE
             ]
         ];
         $greyStyle = [
@@ -96,6 +101,18 @@ class PerformanceRecordController extends AuthenticatedController
             ]
         ];
 
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getProperties()
+            ->setCreator($GLOBALS['user']->getFullname())
+            ->setLastModifiedBy($GLOBALS['user']->getFullname())
+            ->setTitle('Leistungsbezüge ' . $person->getFullname())
+            ->setSubject('Leistungsbezüge ' . $person->getFullname());
+        $spreadsheet->removeSheetByIndex(0);
+        $spreadsheet->getDefaultStyle()->getAlignment()->setWrapText(true);
+        $spreadsheet->getDefaultStyle()->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+        $spreadsheet->getDefaultStyle()->applyFromArray($noBordersStyle);
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+
         $counter = 1;
 
         foreach ($person->cards as $card) {
@@ -107,8 +124,11 @@ class PerformanceRecordController extends AuthenticatedController
              */
             $sheet = $spreadsheet->createSheet();
 
-            $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
-            $sheet->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_A4);
+            $sheet->getPageSetup()
+                ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
+                ->setPaperSize(PageSetup::PAPERSIZE_A4)
+                ->setFitToWidth(1)
+                ->setFitToHeight(0);
 
             $sheet->getColumnDimension('A')->setWidth(43);
             $sheet->getColumnDimension('B')->setWidth(54.5);
@@ -118,6 +138,14 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getColumnDimension('F')->setWidth(43);
             $sheet->getColumnDimension('G')->setWidth(23);
             $sheet->setTitle('Drittmittelprojekte' . (count($person->cards) > 1 ? '_' . $counter : ''));
+
+            // Repeat headers at new page.
+            $sheet->getPageSetup()->setRowsToRepeatAtTop([4,5]);
+
+            // Add page numbers in footer.
+            $sheet->getHeaderFooter()
+                ->setDifferentOddEven(false)
+                ->setOddFooter('&CSeite &P von &N');
 
             // Set header line.
             $sheet->mergeCells('A1:G1');
@@ -133,7 +161,7 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getStyle('A2')
                 ->getFont()
                 ->setBold(true);
-            $sheet->setCellValue('A1', $person->getFullname() .
+            $sheet->setCellValue('A2', $person->getFullname() .
                 ' (' . $card->organisation->name_1 . ')');
 
             $row = 4;
@@ -179,12 +207,14 @@ class PerformanceRecordController extends AuthenticatedController
                 }
             }
 
+            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($noBordersStyle);
             $sheet->getStyle('A' . $row)
                 ->applyFromArray(array_merge($paleStyle, $borderStyle))
                 ->getFont()
                 ->setBold(false);
             $sheet->setCellValue('A' . $row, 'Anträge abgelehnt: ' .
                 count($relations['third_party_declined']));
+
             $row += 2;
 
             $sheet->mergeCells('A' . $row . ':G' . $row);
@@ -194,6 +224,7 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->getStyle('A' . $row)
                 ->applyFromArray($footerStyle);
             $row++;
+            $sheet->mergeCells('A' . $row . ':G' . $row);
             $sheet->setCellValue('A' . $row, 'Stand: ' . date('d.m.Y'));
             $sheet->getStyle('A' . $row)
                 ->applyFromArray($footerStyle);
@@ -225,6 +256,12 @@ class PerformanceRecordController extends AuthenticatedController
                 ->setBold(true);
             $sheet->setCellValue('A2',
                 $person->getFullname() . ' (' . $card->organisation->name_1 . ')');
+
+            $sheet->getStyle('A3:E3')->applyFromArray($noBordersStyle);
+
+            // Add page numbers in footer.
+            $sheet->getHeaderFooter()->setDifferentOddEven(false);
+            $sheet->getHeaderFooter()->setOddFooter('Seite &P von &N');
 
             $row = 4;
 
@@ -265,18 +302,22 @@ class PerformanceRecordController extends AuthenticatedController
                         ->getBorders()
                         ->applyFromArray($borderStyle);
 
-                    $row += 2;
+                    $row++;
+                    $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray($noBordersStyle);
+                    $row++;
                 }
             }
 
+            $sheet->mergeCells('A' . $row . ':E' . $row);
             $sheet->setCellValue('A' . $row,
                 'Alphabetisch sortiert nach Kurzbezeichnung');
             $sheet->getStyle('A' . $row)
-                ->applyFromArray($footerStyle);
+                ->applyFromArray(array_merge($footerStyle, $noBordersStyle));
             $row++;
+            $sheet->mergeCells('A' . $row . ':E' . $row);
             $sheet->setCellValue('A' . $row, 'Stand: ' . date('d.m.Y'));
             $sheet->getStyle('A' . $row)
-                ->applyFromArray($footerStyle);
+                ->applyFromArray(array_merge($footerStyle, $noBordersStyle));
 
             $counter++;
         }
@@ -287,9 +328,21 @@ class PerformanceRecordController extends AuthenticatedController
             $this->start->format('d.m.Y') . '-' .
             $this->end->format('d.m.Y');
 
-        $writer = new Xlsx($spreadsheet);
-        $filename .= '.xlsx';
-        $this->set_content_type('vnd.openxmlformats-officedocument. spreadsheetml.sheet');
+        if ($format === 'xls') {
+
+            $writer = new Xlsx($spreadsheet);
+            $filename .= '.xlsx';
+            $this->set_content_type('vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        } else if ($format === 'pdf') {
+
+            $writer = IOFactory::createWriter($spreadsheet, 'Mpdf');
+            $writer->writeAllSheets();
+            $writer->setFont('dejavusans');
+            $filename .= '.pdf';
+            $this->set_content_type('application/pdf');
+
+        }
 
         $this->response->add_header('Content-Disposition',
             'attachment;' . encode_header_parameter('filename', $filename));
@@ -311,24 +364,7 @@ class PerformanceRecordController extends AuthenticatedController
      */
     public function pdf_action($start, $end, $username)
     {
-        $this->sections = $this->getSections();
-        $this->person = ConverisPerson::findOneByUsername($username);
-        $this->start = new DateTime($start);
-        $this->end = new DateTime($end);
-        $this->dataExists = false;
-
-        $this->set_content_type('application/pdf');
-        $this->response->add_header('Cache-Control', 'cache, must-revalidate');
-        $this->response->add_header('Pragma', 'public');
-
-        $mpdf = new Mpdf(['orientation' => 'L']);
-        $mpdf->setHTMLFooter('Stand: ' . date('d.m.Y') . ', Seite {PAGENO}/{nb}', 'OE');
-        $mpdf->WriteHTML($this->render_template_as_string('export_templates/performancerecord_pdf'));
-        $mpdf->Output('Leistungsbezüge-' . $this->person->getFullName() . '-' .
-            $this->start->format('d.m.Y') . '-' .
-            $this->end->format('d.m.Y') . '.pdf', 'D');
-
-        $this->render_nothing();
+        $this->relocate('performancerecord/xls', $start, $end, $username, 'pdf');
     }
 
     private function getSections()
@@ -423,7 +459,7 @@ class PerformanceRecordController extends AuthenticatedController
                          * Section 2: third party projects that are approved
                          * and of type EU, National or International
                          */
-                        } else if ($rel->project->status->name_1 == 'Bewilligt' &&
+                        } else if (in_array($rel->project->status->name_1, ['Bewilligt', 'Beendet']) &&
                             in_array($rel->project->third_party_data->type->name_1,
                                 ['EU', 'National', 'International'])) {
 
@@ -433,7 +469,7 @@ class PerformanceRecordController extends AuthenticatedController
                          * Section 3: third party projects that are approved
                          * and of type Auftragsforschung, Kooperation or Lizenz
                          */
-                        } else if ($rel->project->status->name_1 == 'Bewilligt' &&
+                        } else if (in_array($rel->project->status->name_1, ['Bewilligt', 'Beendet']) &&
                             in_array($rel->project->third_party_data->type->name_1,
                                 ['Auftragsforschung', 'Kooperation', 'Lizenz'])) {
 
@@ -711,7 +747,12 @@ class PerformanceRecordController extends AuthenticatedController
                 foreach ($project->areas as $area) {
                     $keywords[] = $area->area_type . ': ' . $area->short_description;
                 }
-            } else {
+            }
+            if ($project->keywords_1 != '' || $project->keywords_2) {
+                $keywords[] = $project->keywords_1 ?: $project->keywords_2;
+            }
+
+            if (count($keywords) === 0) {
                 $keywords = ['k. A.'];
             }
 
@@ -793,9 +834,15 @@ class PerformanceRecordController extends AuthenticatedController
                 foreach ($project->areas as $area) {
                     $keywords[] = $area->area_type . ': ' . $area->short_description;
                 }
-            } else {
+            }
+            if ($project->keywords_1 != '' || $project->keywords_2) {
+                $keywords[] = $project->keywords_1 ?: $project->keywords_2;
+            }
+
+            if (count($keywords) === 0) {
                 $keywords = ['k. A.'];
             }
+
             $keywordsText->createText(' ' . implode(', ', $keywords) . "\n\n");
             $shortdesc = $keywordsText->createTextRun('Kurzbeschreibung:');
             $shortdesc->getFont()->setUnderline(true);
