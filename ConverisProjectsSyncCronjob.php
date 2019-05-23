@@ -465,28 +465,32 @@ class ConverisProjectsSyncCronjob extends CronJob {
             // Connect projects and cards
             $this->importConverisData(
                 "SELECT DISTINCT
-                    iot_project AS project_id,
-                    iot_card AS card_id,
+                    cp.iot_project AS project_id,
+                    cp.iot_card AS card_id,
                     'internal' AS type,
-                    role AS role_id,
+                    cp.role AS role_id,
                     CASE
-                        WHEN junior_scientist THEN 1
+                        WHEN cp.junior_scientist THEN 1
                         ELSE 0
                     END AS junior_scientist,
-                    contributed_share,
-                    percentage_of_funding,
-                    start_date,
-                    end_date,
-                    iot_project_seq AS order_project,
-                    iot_card_seq AS order_card,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM rel_card_has_project_int
-                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                    cp.contributed_share,
+                    cp.percentage_of_funding,
+                    cp.start_date,
+                    cp.end_date,
+                    cp.iot_project_seq AS order_project,
+                    cp.iot_card_seq AS order_card,
+                    cp.c_created_on AS mkdate,
+                    cp.c_updated_on AS chdate
+                FROM rel_card_has_project_int cp
+                    JOIN iot_project p ON (p.id = cp.iot_project)
+                    JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
+                WHERE (cp.c_created_on > :tstamp OR cp.c_updated_on > :tstamp)
+                    AND s.infoobjecttype = 36
+                    AND s.status_process <> 5
                 UNION
                 SELECT DISTINCT
-                    iot_project AS project_id,
-                    iot_card AS person_id,
+                    cp.iot_project AS project_id,
+                    cp.iot_card AS person_id,
                     'external' AS type,
                     NULL::int AS role_id,
                     0 AS junior_scientist,
@@ -494,33 +498,41 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
-                    iot_project_seq AS order_project,
-                    iot_card_seq AS order_card,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM rel_card_has_project_ext
-                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                    cp.iot_project_seq AS order_project,
+                    cp.iot_card_seq AS order_card,
+                    cp.c_created_on AS mkdate,
+                    cp.c_updated_on AS chdate
+                FROM rel_card_has_project_ext cp
+                    JOIN iot_project p ON (p.id = cp.iot_project)
+                    JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
+                WHERE (cp.c_created_on > :tstamp OR cp.c_updated_on > :tstamp)
+                    AND s.infoobjecttype = 36
+                    AND s.status_process <> 5
                 UNION
                 SELECT DISTINCT
-                    iot_project_general AS project_id,
-                    iot_card AS card_id,
+                    cp.iot_project_general AS project_id,
+                    cp.iot_card AS card_id,
                     'internal' AS type,
-                    role AS role_id,
+                    cp.role AS role_id,
                     0 AS junior_scientist,
                     NULL AS contributed_share,
                     NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
-                    iot_project_general_seq AS order_project,
-                    iot_card_seq AS order_card,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM rel_card_has_proj_frin
-                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                    cp.iot_project_general_seq AS order_project,
+                    cp.iot_card_seq AS order_card,
+                    cp.c_created_on AS mkdate,
+                    cp.c_updated_on AS chdate
+                FROM rel_card_has_proj_frin cp
+                    JOIN iot_project_general p ON (p.id = cp.iot_project_general)
+                    JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
+                WHERE (cp.c_created_on > :tstamp OR cp.c_updated_on > :tstamp)
+                    AND s.infoobjecttype = 172
+                    AND s.status_process <> 5
                 UNION
                 SELECT DISTINCT
-                    iot_project_general AS project_id,
-                    iot_card AS card_id,
+                    cp.iot_project_general AS project_id,
+                    cp.iot_card AS card_id,
                     'external' AS type,
                     NULL::int AS role_id,
                     0 AS junior_scientist,
@@ -528,12 +540,16 @@ class ConverisProjectsSyncCronjob extends CronJob {
                     NULL AS percentage_of_funding,
                     NULL::timestamp AS start_date,
                     NULL::timestamp AS end_date,
-                    iot_project_general_seq AS order_project,
-                    iot_card_seq AS order_card,
-                    c_created_on AS mkdate,
-                    c_updated_on AS chdate
-                FROM rel_card_has_proj_frex
-                WHERE c_created_on > :tstamp OR c_updated_on > :tstamp
+                    cp.iot_project_general_seq AS order_project,
+                    cp.iot_card_seq AS order_card,
+                    cp.c_created_on AS mkdate,
+                    cp.c_updated_on AS chdate
+                FROM rel_card_has_proj_frex cp
+                    JOIN iot_project_general p ON (p.id = cp.iot_project_general)
+                    JOIN iothasstatusprocess s ON (s.status_sequence = p.status_process)
+                WHERE (cp.c_created_on > :tstamp OR cp.c_updated_on > :tstamp)
+                    AND s.infoobjecttype = 172
+                    AND p.status_process <> 5
                 ORDER BY project_id, card_id",
                 'ConverisProjectCardRelation',
                 ['project_id', 'card_id']
