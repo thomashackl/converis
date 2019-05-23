@@ -31,9 +31,6 @@ class AddOrderColumns extends Migration {
 
         SimpleORMap::expireTableScheme();
 
-        /*
-         * Execute sync cronjob so that we don't have to wait until next regular run.
-         */
         $job = new ConverisProjectsSyncCronjob();
         $job->execute('');
     }
