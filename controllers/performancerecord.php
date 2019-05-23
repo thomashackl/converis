@@ -164,6 +164,8 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->setCellValue('A2', $person->getFullname() .
                 ' (' . $card->organisation->name_1 . ')');
 
+            $sheet->getStyle('A3:G3')->applyFromArray($noBordersStyle);
+
             $row = 4;
 
             foreach ($sections['third_party'] as $index => $section) {
@@ -203,7 +205,9 @@ class PerformanceRecordController extends AuthenticatedController
                         ->getBorders()
                         ->applyFromArray($borderStyle);
 
-                    $row += 2;
+                    $row++;
+                    $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($noBordersStyle);
+                    $row++;
                 }
             }
 
@@ -215,8 +219,9 @@ class PerformanceRecordController extends AuthenticatedController
             $sheet->setCellValue('A' . $row, 'Anträge abgelehnt: ' .
                 count($relations['third_party_declined']));
 
-            $row += 2;
+            $row++;
 
+            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($noBordersStyle);
             $sheet->mergeCells('A' . $row . ':G' . $row);
             $sheet->setCellValue('A' . $row,
                 'Alphabetisch sortiert nach Mittelgeber/Förderprogramm '.
@@ -441,6 +446,7 @@ class PerformanceRecordController extends AuthenticatedController
              * them into the relevant section.
              */
             foreach ($card->related_projects as $rel) {
+
                 // Just consider projects running in given time frame.
                 if ($rel->project->runsInTimeframe($this->start, $this->end)) {
                     if ($rel->project->type === 'third_party') {
