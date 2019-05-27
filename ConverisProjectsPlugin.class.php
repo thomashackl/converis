@@ -24,8 +24,8 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
         // Localization
         bindtextdomain('converisplugin', realpath(__DIR__.'/locale'));
 
-        // Plugin only available for roots or role.
-        if ($GLOBALS['perm']->have_perm('root') || ConverisAdmin::findOneByUser_id($GLOBALS['user']->id)) {
+        // Plugin only available for roots or converis admins.
+        if (!$GLOBALS['perm']->have_perm('root') && !$this->checkPermission()) {
             $navigation = new Navigation($this->getDisplayName(),
                 PluginEngine::getURL($this, [], 'projects'));
 

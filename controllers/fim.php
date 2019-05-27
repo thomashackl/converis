@@ -35,7 +35,7 @@ class FIMController extends AuthenticatedController
     public function before_filter(&$action, &$args) {
         $this->plugin = $this->dispatcher->plugin;
 
-        if (!$GLOBALS['perm']->have_perm('root') || ConverisAdmin::findOneByUser_id($GLOBALS['user']->id)) {
+        if (!$GLOBALS['perm']->have_perm('root') && !$this->plugin->checkPermission()) {
             throw new AccessDeniedException();
         }
 
