@@ -742,8 +742,8 @@ class PerformanceRecordController extends AuthenticatedController
                     $cost->createText("\n\n");
                     $costpart = $cost->createTextRun(sprintf("Anteil %s:\n", $relation->card->person->getFullname()));
                     $costpart->getFont()->setUnderline(true);
-                    $cost->createText('an Fördersumme: ' . ($relation->percentage_of_funding ?: 'k. A.' . "\n"));
-                    $cost->createText('an Eigenanteil: ' . ($relation->contributed_share ?: 'k. A.' . "\n"));
+                    $cost->createText('an Fördersumme: ' . ($relation->percentage_of_funding ?: 'k. A.') . "\n");
+                    $cost->createText('an Eigenanteil: ' . ($relation->contributed_share ?: 'k. A.') . "\n");
                 }
             }
 
