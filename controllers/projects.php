@@ -23,7 +23,7 @@ class ProjectsController extends AuthenticatedController {
         $this->plugin = $this->dispatcher->plugin;
         $this->flash = Trails_Flash::instance();
 
-        if (!$GLOBALS['perm']->have_perm('root') && !$this->plugin->checkPermission()) {
+        if ($GLOBALS['perm']->have_perm('root') || $this->plugin->checkPermission()) {
 
             if (Request::isXhr()) {
                 $this->set_layout(null);
