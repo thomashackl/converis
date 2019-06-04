@@ -727,13 +727,26 @@ class ConverisProjectsSyncCronjob extends CronJob {
                 $params = [$one[$checkKey]];
             }
 
-            array_walk($one, function(&$value, $key) {
-                $value = html_entity_decode(strip_tags($value));
-            });
-
             //echo sprintf("%u CountBySQL:<pre>%s</pre>\n", $one[$checkKey], print_r($studipModelName::countBySQL($sql, $params), 1));
 
-            $object = $studipModelName::build($one, $studipModelName::countBySQL($sql, $params) == 0);
+            if ($studipModelName::countBySQL($sql, $params) == 0) {
+                $object = new $studipModelName();
+            } else {
+                if (is_array($checkKey)) {
+                    $key = [];
+                    foreach ($checkKey as $col) {
+                        $key[] = $one[$col];
+                    }
+                    $object = $studipModelName::find($key);
+                } else {
+                    $object = $studipModelName::find($one[$checkKey]);
+                }
+            }
+
+            foreach ($one as $col => $value) {
+                $object->$col = html_entity_decode(strip_tags($value));
+            }
+
             $object->store();
         }
     }
