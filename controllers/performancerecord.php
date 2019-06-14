@@ -771,7 +771,22 @@ class PerformanceRecordController extends AuthenticatedController
                 foreach ($internal as $rel) {
                     $current = $rel->card->person->getFullname();
                     if ($rel->role_id != 0) {
-                        $current .= ' (' . $rel->role->name_1 . ')';
+                        $current .= ' (' . $rel->role->name_1;
+                    }
+
+                    $roleStart = new DateTime($rel->start_date);
+                    $roleEnd = new DateTime($rel->end_date);
+                    if ($roleStart->getTimestamp() > 0 && $roleEnd->getTimestamp() <= 0) {
+                        $current .= ' ab ' . $roleStart->format('d.m.Y');
+                    } else if ($roleStart->getTimestamp() <= 0 && $roleEnd->getTimestamp() > 0) {
+                        $current .= ' bis ' . $roleEnd->format('d.m.Y');
+                    } else if ($roleStart->getTimestamp() > 0 && $roleEnd->getTimestamp() > 0) {
+                        $current .= ' von ' . $roleStart->format('d.m.Y') .
+                            ' bis ' . $roleEnd->format('d.m.Y');
+                    }
+
+                    if ($rel->role_id != 0) {
+                        $current .= ')';
                     }
                     $persons[] = $current;
                 }
