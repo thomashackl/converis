@@ -44,7 +44,24 @@
                                 $rel->card->person->last_name
                             ])) ?>
                             <?php if ($rel->role != 0) : ?>
-                                (<?= htmlReady($rel->role->name_1) ?>)
+                                (<?= htmlReady($rel->role->name_1) ?>
+                            <?php endif ?>
+
+                            <?php
+                                $roleStart = new DateTime($rel->start_date);
+                                $roleEnd = new DateTime($rel->end_date);
+                            ?>
+                            <?php if ($roleStart->getTimestamp() > 0 && $roleEnd->getTimestamp() <= 0) : ?>
+                                ab <?= $roleStart->format('d.m.Y') ?>
+                            <?php elseif ($roleStart->getTimestamp() <= 0 && $roleEnd->getTimestamp() > 0) : ?>
+                                bis <?= $roleEnd->format('d.m.Y') ?>
+                            <?php elseif ($roleStart->getTimestamp() > 0 && $roleEnd->getTimestamp() > 0) : ?>
+                                von <?= $roleStart->format('d.m.Y') ?>
+                                bis <?= $roleEnd->format('d.m.Y') ?>
+                            <?php endif ?>
+
+                            <?php if ($rel->role != 0) : ?>
+                                )
                             <?php endif ?>
                         <?php else : ?>
                             <ul>
@@ -55,9 +72,32 @@
                                             $rel->card->person->first_name,
                                             $rel->card->person->last_name
                                         ])) ?>
-                                        <?php if ($rel->role != 0) : ?>
-                                            (<?= htmlReady($rel->role->name_1) ?>)
-                                        <?php endif ?>
+
+                                        <?php
+                                            $roleStart = new DateTime($rel->start_date);
+                                            $roleEnd = new DateTime($rel->end_date);
+                                            $text = '';
+                                        ?>
+
+                                        <?php
+                                            if ($rel->role != 0) {
+                                                $text .= '(' . htmlReady($rel->role->name_1);
+                                            }
+
+                                            if ($roleStart->getTimestamp() > 0 && $roleEnd->getTimestamp() <= 0) {
+                                                $text .= ' ab ' . $roleStart->format('d.m.Y');
+                                            } else if ($roleStart->getTimestamp() <= 0 && $roleEnd->getTimestamp() > 0) {
+                                                $text .= ' bis ' . $roleEnd->format('d.m.Y');
+                                            } else if ($roleStart->getTimestamp() > 0 && $roleEnd->getTimestamp() > 0) {
+                                                $text .= ' von ' . $roleStart->format('d.m.Y') .
+                                                    ' bis ' . $roleEnd->format('d.m.Y');
+                                            }
+
+                                            if ($rel->role != 0) {
+                                                $text .= ')';
+                                            }
+                                        ?>
+                                        <?= $text ?>
                                     </li>
                                 <?php endforeach ?>
                             </ul>
