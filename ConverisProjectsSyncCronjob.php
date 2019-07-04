@@ -44,6 +44,8 @@ class ConverisProjectsSyncCronjob extends CronJob {
          */
         if ($host !== 'converis.host.name') {
 
+            StudipAutoloader::addAutoloadPath(__DIR__ . '/models');
+
             $this->converis = new PDO(sprintf(
                 'pgsql:dbname=%s;host=%s;user=%s;password=%s',
                 $database, $host, $username, $password
