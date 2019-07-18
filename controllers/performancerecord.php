@@ -627,9 +627,9 @@ class PerformanceRecordController extends AuthenticatedController
                 $duration = $pStart->format('d.m.Y') . ' - ' .
                     $pEnd->format('d.m.Y');
             }
-            if ($useApplication && $project->application->duration_in_months != null) {
+            if ($useApplication && $project->application->duration_in_months != 0) {
                 $duration .= "\n(" . $project->application->duration_in_months . ' Monate)';
-            } else if ($project->third_party_data->duration_in_months != null) {
+            } else if ($project->third_party_data->duration_in_months != 0) {
                 $duration .= "\n(" . $project->third_party_data->duration_in_months . ' Monate)';
             }
 
