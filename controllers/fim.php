@@ -537,8 +537,8 @@ class FIMController extends AuthenticatedController
                         ]) . "\n");
                 $cost->createText('Hinweis: ' .
                     ($useApplication ?
-                        ($project->application->commentary_financial_data ?: 'k. A.') :
-                        ($project->third_party_data->commentary_funding ?: 'k. A.')
+                        (trim($project->application->commentary_financial_data) ?: 'k. A.') :
+                        (trim($project->third_party_data->commentary_funding) ?: 'k. A.')
                     ));
 
             } else if (in_array($project->third_party_data->type->name_1, ['Auftragsforschung', 'Kooperation', 'Lizenz'])) {
@@ -546,7 +546,7 @@ class FIMController extends AuthenticatedController
                     number_format($project->third_party_data->contract_sum_netto, 2, ',', '.') .
                     $project->third_party_data->contract_sum_netto_cur
                 );
-                $cost->createText("\nHinweis: " . $project->third_party_data->commentary_funding ?: 'k. A.');
+                $cost->createText("\nHinweis: " . (trim($project->third_party_data->commentary_funding) ?: 'k. A.'));
             }
 
             // Keywords
