@@ -694,6 +694,14 @@ class ConverisProjectsSyncCronjob extends CronJob {
         $stmt = $this->converis->prepare($converisQuery);
         $parameters = [];
 
+        /**
+         * TODO: Do not truncate the whole table, but provide
+         * an intelligent mechanism for cleaning obsolete data.
+         */
+        $object = new $studipModelName;
+        $meta = $object->getTableMetadata();
+        DBManager::get()->execute("TRUNCATE TABLE `" . $meta['table'] . "`");
+
         /*
          * Fetch maximal mkdate or chdate from table,
          * thus defining last successful import
@@ -765,6 +773,12 @@ class ConverisProjectsSyncCronjob extends CronJob {
         //echo sprintf("Raw processing %s...\n", $studipTable);
         $stmt = $this->converis->prepare($converisQuery);
         $parameters = [];
+
+        /**
+         * TODO: Do not truncate the whole table, but provide
+         * an intelligent mechanism for cleaning obsolete data.
+         */
+        DBManager::get()->execute("TRUNCATE TABLE `" . $studipTable . "`");
 
         /*
          * Fetch maximal mkdate or chdate from table,
