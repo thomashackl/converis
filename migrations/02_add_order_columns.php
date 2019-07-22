@@ -4,6 +4,11 @@ require_once(realpath(__DIR__ . '/../ConverisProjectsSyncCronjob.php'));
 
 class AddOrderColumns extends Migration {
 
+    public function description()
+    {
+        return 'database fields for using custom sort order from Converis';
+    }
+
     public function up()
     {
         /*

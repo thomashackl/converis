@@ -2,6 +2,11 @@
 
 class FIMXLSTemplate extends Migration {
 
+    public function description()
+    {
+        return 'FIM export template in XLSX format';
+    }
+
     public function up()
     {
 

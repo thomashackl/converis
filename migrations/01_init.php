@@ -2,6 +2,11 @@
 
 class Init extends Migration {
 
+    public function description()
+    {
+        return 'setup plugin database tables and config entries';
+    }
+
     public function up()
     {
 
