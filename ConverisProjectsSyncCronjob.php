@@ -26,7 +26,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
     }
 
     public static function getDescription() {
-        return dgettext('garudaplugin', 'Holt alle Forschungsprojekte inkl. Daten aus Converis');
+        return dgettext('converisplugin', 'Holt alle Forschungsprojekte inkl. Daten aus Converis');
     }
 
     /**
