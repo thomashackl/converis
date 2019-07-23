@@ -40,6 +40,9 @@ class ConverisProjectsPlugin extends StudIPPlugin implements SystemPlugin {
                 $navigation->addSubNavigation('admins',
                     new Navigation(dgettext('converisplugin', 'Berechtigungen'),
                         PluginEngine::getURL($this, [], 'settings/admins')));
+                $navigation->addSubNavigation('sorting',
+                    new Navigation(dgettext('converisplugin', 'Projektstatussortierung'),
+                        PluginEngine::getURL($this, [], 'sorting')));
             }
 
             Navigation::addItem('/tools/converisprojects', $navigation);

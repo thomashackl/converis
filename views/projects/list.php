@@ -18,7 +18,7 @@
             <th data-sort="numeric"><?= dgettext('converisplugin', 'Beginn') ?></th>
             <th data-sort="numeric"><?= dgettext('converisplugin', 'Ende') ?></th>
             <th><?= dgettext('converisplugin', 'Personen') ?></th>
-            <th data-sort="text"><?= dgettext('converisplugin', 'Status') ?></th>
+            <th data-sort="numeric"><?= dgettext('converisplugin', 'Status') ?></th>
         </tr>
     </thead>
     <tbody>
@@ -106,7 +106,7 @@
                         -
                     <?php endif ?>
                 </td>
-                <td><?= htmlReady($project->status->name_1) ?></td>
+                <td data-sort-value="<?= $project->status->position ?>"><?= htmlReady($project->status->name_1) ?></td>
             </tr>
         <?php endforeach ?>
     </tbody>

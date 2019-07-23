@@ -105,7 +105,7 @@ class ConverisProject extends SimpleORMap
                 JOIN `converis_organisations` o ON (o.`organisation_id` = c.`organisation_id`)
                 JOIN `converis_project_status` s ON (s.`status_id` = p.`status_id`)
             WHERE o.`name_1` = :name
-            ORDER BY s.`name_1`, p.`name`",
+            ORDER BY s.`position`, s.`name_1`, p.`name`",
             ['name' => $name],
             __CLASS__ . '::buildExisting'
         );
@@ -128,7 +128,7 @@ class ConverisProject extends SimpleORMap
                 JOIN `converis_persons` pers ON (pers.`person_id` = c.`person_id`)
                 JOIN `converis_project_status` s ON (s.`status_id` = p.`status_id`)
             WHERE pers.`username` = :username
-            ORDER BY s.`name_1`, p.`name`",
+            ORDER BY s.`position`, s.`name_1`, p.`name`",
             ['username' => $username],
             __CLASS__ . '::buildExisting'
         );

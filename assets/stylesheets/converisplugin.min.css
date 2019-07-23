@@ -1,1 +1,1 @@
-form.default fieldset legend{margin-bottom:10px}table.default tr td{vertical-align:top}table.default tr td ul{padding-left:20px}
+form.default fieldset legend{margin-bottom:10px}table.default tr.sort-success{background-color:rgba(0,150,45,0.3)}table.default tr.sort-failed{background-color:rgba(214,0,0,0.3)}table.default tr td{vertical-align:top}table.default tr td ul{padding-left:20px}.status-placeholder{background-color:#ececed;border:1px dotted #b1b4b8;height:1.5em;line-height:1.2em}

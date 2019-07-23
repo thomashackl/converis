@@ -8,6 +8,15 @@ form.default {
 
 table.default {
   tr {
+
+    &.sort-success {
+      background-color: rgba(0, 150, 45, 0.3);
+    }
+
+    &.sort-failed {
+      background-color: rgba(214, 0, 0, 0.3);
+    }
+
     td {
       vertical-align: top;
 
@@ -16,4 +25,11 @@ table.default {
       }
     }
   }
+}
+
+.status-placeholder {
+  background-color: #ececed;
+  border: 1px dotted #b1b4b8;
+  height: 1.5em;
+  line-height: 1.2em;
 }

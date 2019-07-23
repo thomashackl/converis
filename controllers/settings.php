@@ -36,13 +36,10 @@ class SettingsController extends AuthenticatedController
 
             if (Studip\ENV == 'development') {
                 $style = $this->plugin->getPluginURL().'/assets/stylesheets/converisplugin.css';
-                $js = $this->plugin->getPluginURL().'/assets/javascripts/converisplugin.js';
             } else {
                 $css = $this->plugin->getPluginURL().'/assets/stylesheets/converisplugin.min.css';
-                $js = $this->plugin->getPluginURL().'/assets/javascripts/converisplugin.min.js';
             }
             PageLayout::addStylesheet($css);
-            PageLayout::addScript($js);
 
         } else {
             throw new AccessDeniedException();

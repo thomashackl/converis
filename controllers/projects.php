@@ -39,10 +39,10 @@ class ProjectsController extends AuthenticatedController {
 
             if (Studip\ENV == 'development') {
                 $style = $this->plugin->getPluginURL().'/assets/stylesheets/converisplugin.css';
-                $js = $this->plugin->getPluginURL().'/assets/javascripts/converisplugin.js';
+                $js = $this->plugin->getPluginURL().'/assets/javascripts/start.js';
             } else {
                 $css = $this->plugin->getPluginURL().'/assets/stylesheets/converisplugin.min.css';
-                $js = $this->plugin->getPluginURL().'/assets/javascripts/converisplugin.min.js';
+                $js = $this->plugin->getPluginURL().'/assets/javascripts/start.min.js';
             }
             PageLayout::addStylesheet($css);
             PageLayout::addScript($js);

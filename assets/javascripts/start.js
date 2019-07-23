@@ -1,6 +1,6 @@
-(function ($) {
+$(function () {
 
-    $(document).on('click', 'input[name="type"]', function() {
+    $('input[name="type"]').on('click', function() {
         $('section.typeselect').addClass('hidden-js');
         $('#type-' + $(this).val()).removeClass('hidden-js');
     });
@@ -13,4 +13,4 @@
         $('#template').focus();
     });
 
-}(jQuery));
+});
