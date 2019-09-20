@@ -4,7 +4,7 @@
                 '%1$u Forschungsprojekte für %2$s',
                 count($projects)),
             count($projects), $name) ?></h2>
-<table class="default sortable-table" data-sortlist="[[4,0],[0,0]]" width="100%">
+<table class="default sortable-table" data-sortlist="[[4,0]]" width="100%">
     <colgroup>
         <col>
         <col width="100">
