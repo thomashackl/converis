@@ -205,7 +205,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                         project_number,
                         project_type AS type_id,
                         CASE
-                            WHEN p.doctoral_program THEN 1
+                            WHEN c11.value_1 = 'Ja' THEN 1
                             ELSE 0
                         END AS doctoral_program,
                         duration_in_months,
@@ -251,6 +251,7 @@ class ConverisProjectsSyncCronjob extends CronJob {
                         LEFT JOIN choicegroupvalue c8 ON (c8.id = p.contract_tax_cur)
                         LEFT JOIN choicegroupvalue c9 ON (c9.id = p.own_contribution_cur)
                         LEFT JOIN choicegroupvalue c10 ON (c10.id = p.funding_amount_cur)
+                        LEFT JOIN choicegroupvalue c11 ON (c11.id = p.doctoral_program)
                     WHERE s.infoobjecttype = 36
                         AND s.status_process <> 5
                         AND p.c_created_on > :tstamp OR p.c_updated_on > :tstamp
