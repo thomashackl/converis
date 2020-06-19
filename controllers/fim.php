@@ -215,6 +215,19 @@ class FIMController extends AuthenticatedController
         $sheet->setCellValue('A' . $row, 'Stand: ' . date('d.m.Y'));
         $sheet->getStyle('A' . $row)
             ->applyFromArray($footerStyle);
+        $row++;
+        $sheet->mergeCells('A' . $row . ':G' . $row);
+        $sheet->getRowDimension($row)->setRowHeight(36);
+        $sheet->setCellValue('A' . $row, 'Der Auszug aus dem Forschungsinformationssystem kann ' .
+            'Drittmittelanträge und/oder -projekte enthalten, die Wissenschaftlerinnen und Wissenschaftler ' .
+            'in ihrer Funktion als wissenschaftliche Leitung einer Einrichtung betreuen. Beziehen sie für ' .
+            'diese Leitung bereits einen Funktionsleistungsbezug, können die im Auszug aus dem ' .
+            'Forschungsinformationssystem genannten Drittmittelanträge und/oder -projekte einer Einrichtung ' .
+            'in der Regel nicht im Rahmen der Vergabe besonderer Leistungsbezüge berücksichtigt werden. ' .
+            'Dies gilt entsprechend für Wissenschaftlerinnen und Wissenschaftler in ihrer Funktion als ' .
+            'Frauenbeauftragte/r.');
+        $sheet->getStyle('A' . $row)
+            ->applyFromArray($footerStyle);
 
         $spreadsheet->setActiveSheetIndex(0);
 

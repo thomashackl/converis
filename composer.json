@@ -1,6 +1,7 @@
 {
   "name": "unipassau/studip-converisprojects",
   "description": "Provides research project data from Converis in Stud.IP",
+  "version": "2.4",
   "minimum-stability": "stable",
   "license": "GPL-2 or later",
   "authors": [
@@ -11,6 +12,6 @@
   ],
   "require": {
     "phpoffice/phpspreadsheet": ">=1.2.1",
-    "mpdf/mpdf": ">=6.0"
+    "mpdf/mpdf": ">=8.0.4"
   }
 }
